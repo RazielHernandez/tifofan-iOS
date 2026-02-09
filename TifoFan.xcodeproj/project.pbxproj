@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		691280252F398CA10090041B /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 691280242F398CA10090041B /* FirebaseAnalytics */; };
+		691280272F398CA10090041B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 691280262F398CA10090041B /* FirebaseAuth */; };
+		691280292F398CA10090041B /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 691280282F398CA10090041B /* FirebaseCore */; };
+		6912802B2F398CA10090041B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6912802A2F398CA10090041B /* FirebaseFirestore */; };
+		6912802D2F398CA10090041B /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 6912802C2F398CA10090041B /* FirebaseFunctions */; };
+		6912802F2F398CA10090041B /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6912802E2F398CA10090041B /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		691280102F33C3070090041B /* TifoFan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TifoFan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +32,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				691280252F398CA10090041B /* FirebaseAnalytics in Frameworks */,
+				6912802B2F398CA10090041B /* FirebaseFirestore in Frameworks */,
+				6912802D2F398CA10090041B /* FirebaseFunctions in Frameworks */,
+				691280292F398CA10090041B /* FirebaseCore in Frameworks */,
+				691280272F398CA10090041B /* FirebaseAuth in Frameworks */,
+				6912802F2F398CA10090041B /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +80,12 @@
 			);
 			name = TifoFan;
 			packageProductDependencies = (
+				691280242F398CA10090041B /* FirebaseAnalytics */,
+				691280262F398CA10090041B /* FirebaseAuth */,
+				691280282F398CA10090041B /* FirebaseCore */,
+				6912802A2F398CA10090041B /* FirebaseFirestore */,
+				6912802C2F398CA10090041B /* FirebaseFunctions */,
+				6912802E2F398CA10090041B /* FirebaseStorage */,
 			);
 			productName = TifoFan;
 			productReference = 691280102F33C3070090041B /* TifoFan.app */;
@@ -94,6 +115,9 @@
 			);
 			mainGroup = 691280072F33C3070090041B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 691280112F33C3070090041B /* Products */;
 			projectDirPath = "";
@@ -269,6 +293,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pumaazteca.TifoFan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -301,6 +328,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pumaazteca.TifoFan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -332,6 +362,50 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		691280242F398CA10090041B /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		691280262F398CA10090041B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		691280282F398CA10090041B /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		6912802A2F398CA10090041B /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6912802C2F398CA10090041B /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		6912802E2F398CA10090041B /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 691280232F398CA10090041B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 691280082F33C3070090041B /* Project object */;
 }
