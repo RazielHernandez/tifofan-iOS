@@ -1,0 +1,5 @@
+1. Go to Firebase Console
+2. Create or open the project
+3. Add an iOS app
+4. Download `GoogleService-Info.plist`
+5. Place it inside the project root
