@@ -13,20 +13,20 @@ struct ContentView: View {
         TabView {
             
             Tab("Dashboard", systemImage: "house") {
-                
+                DashboardScreen()
             }
             
             
             Tab("My Club", systemImage: "soccerball") {
-                
+                MyClubScreen()
             }
             
             Tab("Statistics", systemImage: "chart.bar") {
-                
+                StatisticsScreen()
             }
             
             Tab("Settings", systemImage: "gearshape") {
-                
+                SettingsScreen()
             }
         }
     }
