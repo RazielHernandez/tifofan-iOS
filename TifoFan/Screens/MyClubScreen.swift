@@ -12,3 +12,7 @@ struct MyClubScreen: View {
         Text("My Club Screen")
     }
 }
+
+#Preview {
+    MyClubScreen()
+}

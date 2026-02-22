@@ -12,3 +12,7 @@ struct DashboardScreen: View {
         Text("Dashboard Screen")
     }
 }
+
+#Preview {
+    DashboardScreen()
+}
