@@ -8,26 +8,8 @@
 import SwiftUI
 
 struct StatisticsScreen: View {
-    @StateObject private var viewModel = LeagueViewModel()
-        
     var body: some View {
-        NavigationView {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if let error = viewModel.errorMessage {
-                    Text(error)
-                } else {
-                    List(viewModel.leagues) { league in
-                        Text(league.name)
-                    }
-                }
-            }
-            .navigationTitle("Leagues")
-        }
-        .task {
-            await viewModel.fetchLeagues()
-        }
+        MatchesScreen()
     }
 }
 

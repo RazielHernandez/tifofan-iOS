@@ -16,7 +16,13 @@ final class FirebaseService {
     
     private init() {}
     
-    // Generic callable handler
+    private let decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }()
+    
+    // Generic callable handler (Firebase wrapper aware)
     private func callFunction<T: Decodable>(
         name: String,
         data: [String: Any]? = nil,
@@ -27,8 +33,21 @@ final class FirebaseService {
             .httpsCallable(name)
             .call(data)
         
-        let jsonData = try JSONSerialization.data(withJSONObject: result.data)
-        return try JSONDecoder().decode(T.self, from: jsonData)
+        let payload: Any
+        
+        // print("🔥 RAW RESULT:", result.data)
+        
+        if let dict = result.data as? [String: Any],
+           let inner = dict["result"] {
+            payload = inner
+        } else {
+            // If Firebase already returns raw array/object
+            payload = result.data
+        }
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: payload)
+        
+        return try decoder.decode(T.self, from: jsonData)
     }
 }
 
@@ -38,6 +57,47 @@ extension FirebaseService {
         try await callFunction(
             name: "v1-getSupportedLeaguesCallable",
             responseType: [League].self
+        )
+    }
+}
+
+extension FirebaseService {
+    
+    func getMatches(
+        leagueId: Int,
+        season: Int,
+        page: Int = 1
+    ) async throws -> MatchesResponse {
+        try await callFunction(
+            name: "v1-getMatchesCallable",
+            data: [
+                "league": leagueId,
+                "season": season,
+                "page": page
+            ],
+            responseType: MatchesResponse.self
+        )
+    }
+    
+    func getMatchDetail(
+        matchId: Int
+    ) async throws -> MatchDetailResponse {
+        
+        try await callFunction(
+            name: "v1-getMatchDetailCallable",
+            data: ["id": matchId],
+            responseType: MatchDetailResponse.self
+        )
+    }
+    
+    func getMatchStatistics(
+        matchId: Int
+    ) async throws -> MatchStatisticsResponse {
+        
+        try await callFunction(
+            name: "v1-getMatchStatisticsCallable",
+            data: ["id": matchId],
+            responseType: MatchStatisticsResponse.self
         )
     }
 }
