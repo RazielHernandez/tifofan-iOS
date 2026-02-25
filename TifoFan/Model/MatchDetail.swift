@@ -10,8 +10,8 @@ import Foundation
 // MARK: - Match Detail Response
 
 struct MatchDetailResponse: Codable {
-    let data: MatchDetail
-    let meta: SimpleMeta
+    let item: MatchDetail
+    let cached: Bool
 }
 
 struct MatchDetail: Codable, Identifiable {

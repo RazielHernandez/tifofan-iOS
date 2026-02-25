@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StatisticsScreen: View {
     var body: some View {
-        MatchesScreen()
+        MatchStatisticsScreen()
     }
 }
 

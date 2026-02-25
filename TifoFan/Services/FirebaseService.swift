@@ -84,8 +84,8 @@ extension FirebaseService {
     ) async throws -> MatchDetailResponse {
         
         try await callFunction(
-            name: "v1-getMatchDetailCallable",
-            data: ["id": matchId],
+            name: "v1-getMatchDetailsCallable",
+            data: ["fixture": matchId],
             responseType: MatchDetailResponse.self
         )
     }
@@ -96,7 +96,7 @@ extension FirebaseService {
         
         try await callFunction(
             name: "v1-getMatchStatisticsCallable",
-            data: ["id": matchId],
+            data: ["fixture": matchId],
             responseType: MatchStatisticsResponse.self
         )
     }

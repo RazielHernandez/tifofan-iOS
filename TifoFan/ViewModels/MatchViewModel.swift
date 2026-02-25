@@ -54,10 +54,17 @@ final class MatchViewModel: ObservableObject {
         
         do {
             let response = try await service.getMatchDetail(matchId: matchId)
-            selectedMatch = response.data
+            selectedMatch = response.item
             
         } catch {
             errorMessage = error.localizedDescription
+            print("🔥 FULL ERROR:", error)
+            
+            if let nsError = error as NSError? {
+                print("🔥 Code:", nsError.code)
+                print("🔥 Domain:", nsError.domain)
+                print("🔥 UserInfo:", nsError.userInfo)
+            }
         }
         
         isLoading = false
@@ -71,10 +78,17 @@ final class MatchViewModel: ObservableObject {
         
         do {
             let response = try await service.getMatchStatistics(matchId: matchId)
-            statistics = response.data
+            statistics = response.items
             
         } catch {
             errorMessage = error.localizedDescription
+            print("🔥 FULL ERROR:", error)
+            
+            if let nsError = error as NSError? {
+                print("🔥 Code:", nsError.code)
+                print("🔥 Domain:", nsError.domain)
+                print("🔥 UserInfo:", nsError.userInfo)
+            }
         }
         
         isLoading = false

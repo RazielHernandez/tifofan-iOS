@@ -10,8 +10,8 @@ import Foundation
 // MARK: - Match Statistics Response
 
 struct MatchStatisticsResponse: Codable {
-    let data: [TeamMatchStatistics]
-    let meta: SimpleMeta
+    let items: [TeamMatchStatistics]
+    let cached: Bool
 }
 
 struct TeamMatchStatistics: Codable {
