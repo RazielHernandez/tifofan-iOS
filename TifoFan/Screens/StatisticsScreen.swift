@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StatisticsScreen: View {
     var body: some View {
-        MatchStatisticsScreen()
+        TeamDetailScreen(teamId: 2286, leagueId: 262, season: 2023)
     }
 }
 

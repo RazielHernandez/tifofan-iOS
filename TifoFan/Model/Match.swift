@@ -51,7 +51,7 @@ struct Meta: Codable {
 struct Pagination: Codable {
     let page: Int
     let perPage: Int
-    let totalItems: Int
+    let totalItems: Int?
     let totalPages: Int
     let hasNext: Bool
 }

@@ -35,7 +35,7 @@ final class FirebaseService {
         
         let payload: Any
         
-        // print("🔥 RAW RESULT:", result.data)
+        print("🔥 RAW RESULT:", result.data)
         
         if let dict = result.data as? [String: Any],
            let inner = dict["result"] {
@@ -53,10 +53,134 @@ final class FirebaseService {
 
 extension FirebaseService {
     
+    func getTeam(teamId: Int) async throws -> TeamResponse {
+        
+        try await callFunction(
+            name: "v1-getTeamCallable",
+            data: [
+                "id": teamId
+            ],
+            responseType: TeamResponse.self
+        )
+        /*let callable = functions.httpsCallable("v1-getTeamCallable")
+        
+        let result = try await callable.call([
+            "id": teamId
+        ])
+        
+        guard let data = result.data as? [String: Any] else {
+            throw NSError(domain: "DecodingError", code: -1)
+        }
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: data)
+        
+        return try JSONDecoder().decode(TeamResponse.self, from: jsonData)*/
+        
+    }
+    
+    func getTeamDetails(
+            teamId: Int,
+            leagueId: Int,
+            season: Int
+        ) async throws -> TeamDetailsResponse {
+            
+            try await callFunction(
+                name: "v1-getTeamDetailsCallable",
+                data: [
+                    "team": teamId,
+                    "league": leagueId,
+                    "season": season
+                ],
+                responseType: TeamDetailsResponse.self
+            )
+            
+            /*let callable = functions.httpsCallable("v1-getTeamDetailsCallable")
+            
+            let result = try await callable.call([
+                "team": teamId,
+                "league": leagueId,
+                "season": season
+            ])
+            
+            guard let data = result.data as? [String: Any] else {
+                throw NSError(domain: "DecodingError", code: -1)
+            }
+            
+            let jsonData = try JSONSerialization.data(withJSONObject: data)
+            
+            return try JSONDecoder().decode(
+                TeamDetailsResponse.self,
+                from: jsonData
+            )*/
+        }
+}
+
+extension FirebaseService {
+    
+    func getTeamPlayers(
+        teamId: Int,
+        leagueId: Int,
+        season: Int,
+        page: Int = 1
+    ) async throws -> TeamPlayersResponse {
+        
+        try await callFunction(
+            name: "v1-getTeamPlayersCallable",
+            data: [
+                "team": teamId,
+                "league": leagueId,
+                "season": season,
+                "page": page
+            ],
+            responseType: TeamPlayersResponse.self
+        )
+        
+        /*let callable = functions.httpsCallable("v1-getTeamPlayersCallable")
+        
+        let result = try await callable.call([
+            "team": teamId,
+            "league": leagueId,
+            "season": season,
+            "page": page
+        ])
+        
+        guard let data = result.data as? [String: Any] else {
+            throw NSError(domain: "DecodingError", code: -1)
+        }
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: data)
+        
+        return try JSONDecoder().decode(
+            TeamPlayersResponse.self,
+            from: jsonData
+        )*/
+    }
+}
+
+extension FirebaseService {
+    
     func getSupportedLeagues() async throws -> [League] {
         try await callFunction(
             name: "v1-getSupportedLeaguesCallable",
             responseType: [League].self
+        )
+    }
+}
+
+extension FirebaseService {
+    
+    func getPlayer(
+        playerId: Int,
+        season: Int
+    ) async throws -> PlayerResponse {
+        
+        try await callFunction(
+            name: "v1-getPlayerCallable",
+            data: [
+                "id": playerId,
+                "season": season
+            ],
+            responseType: PlayerResponse.self
         )
     }
 }
