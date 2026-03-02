@@ -16,62 +16,64 @@ struct TeamDetailScreen: View {
     @StateObject private var vm = TeamDetailsViewModel()
     
     var body: some View {
-        ScrollView {
+        Group {
             
             if vm.isLoading {
                 ProgressView()
-                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             
-            if let response = vm.response {
-                
-                VStack(spacing: 20) {
-                    
-                    // MARK: - Header
-                    VStack(spacing: 12) {
+            else if vm.errorMessage != nil {
+                ErrorScreen(
+                    errorMessage: "Ooops! Sorry we were unable to fetch the data."
+                )
+            }
+            
+            else if let response = vm.response {
+                ScrollView {
+                    VStack(spacing: 20) {
                         
-                        if let logo = response.team.logo,
-                           let url = URL(string: logo) {
+                        // MARK: - Header
+                        VStack(spacing: 12) {
                             
-                            AsyncImage(url: url) { image in
-                                image.resizable()
-                            } placeholder: {
-                                ProgressView()
+                            if let logo = response.team.logo,
+                               let url = URL(string: logo) {
+                                
+                                AsyncImage(url: url) { image in
+                                    image.resizable()
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                                .frame(width: 100, height: 100)
                             }
-                            .frame(width: 100, height: 100)
+                            
+                            Text(response.team.name)
+                                .font(.title)
+                                .bold()
                         }
                         
-                        Text(response.team.name)
-                            .font(.title)
-                            .bold()
-                    }
-                    
-                    // MARK: - Aggregates
-                    VStack(alignment: .leading, spacing: 8) {
+                        // MARK: - Aggregates
+                        VStack(alignment: .leading, spacing: 8) {
+                            
+                            Text("Season Overview")
+                                .font(.headline)
+                            
+                            aggregateRow("Played", response.aggregates.matchesPlayed)
+                            aggregateRow("Wins", response.aggregates.wins)
+                            aggregateRow("Draws", response.aggregates.draws)
+                            aggregateRow("Losses", response.aggregates.losses)
+                            aggregateRow("Goals For", response.aggregates.goalsFor)
+                            aggregateRow("Goals Against", response.aggregates.goalsAgainst)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
                         
-                        Text("Season Overview")
-                            .font(.headline)
-                        
-                        aggregateRow("Played", response.aggregates.matchesPlayed)
-                        aggregateRow("Wins", response.aggregates.wins)
-                        aggregateRow("Draws", response.aggregates.draws)
-                        aggregateRow("Losses", response.aggregates.losses)
-                        aggregateRow("Goals For", response.aggregates.goalsFor)
-                        aggregateRow("Goals Against", response.aggregates.goalsAgainst)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    
-                    // MARK: - League Stats
-                    VStack(alignment: .leading, spacing: 12) {
-                        
-                        Text("League Stats")
-                            .font(.headline)
+                        // MARK: - League Stats
                         
                         let stats = response.stats
-
+                        
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Form: \(stats.form)")
                             
@@ -84,15 +86,13 @@ struct TeamDetailScreen: View {
                             Text("Goals Against: \(stats.goals.against)")
                         }
                     }
-                }
-                .padding()
-            }
-            
-            if let error = vm.errorMessage {
-                Text(error)
-                    .foregroundColor(.red)
                     .padding()
+                }
             }
+            else {
+                Text("There's nothing here.")
+            }
+                
         }
         .navigationTitle("Team Details")
         .task {
@@ -102,6 +102,67 @@ struct TeamDetailScreen: View {
                 season: season
             )
         }
+    }
+    
+    @ViewBuilder
+    private func contentView(response: TeamDetailsResponse) -> some View {
+        
+        VStack(spacing: 20) {
+            
+            // MARK: - Header
+            VStack(spacing: 12) {
+                
+                if let logo = response.team.logo,
+                   let url = URL(string: logo) {
+                    
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .frame(width: 100, height: 100)
+                }
+                
+                Text(response.team.name)
+                    .font(.title)
+                    .bold()
+            }
+            
+            // MARK: - Aggregates
+            VStack(alignment: .leading, spacing: 8) {
+                
+                Text("Season Overview")
+                    .font(.headline)
+                
+                aggregateRow("Played", response.aggregates.matchesPlayed)
+                aggregateRow("Wins", response.aggregates.wins)
+                aggregateRow("Draws", response.aggregates.draws)
+                aggregateRow("Losses", response.aggregates.losses)
+                aggregateRow("Goals For", response.aggregates.goalsFor)
+                aggregateRow("Goals Against", response.aggregates.goalsAgainst)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+            
+            // MARK: - League Stats
+            
+            let stats = response.stats
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Form: \(stats.form)")
+                
+                Text("Played: \(stats.fixtures.played)")
+                Text("W: \(stats.fixtures.wins)")
+                Text("D: \(stats.fixtures.draws)")
+                Text("L: \(stats.fixtures.losses)")
+                
+                Text("Goals For: \(stats.goals.for)")
+                Text("Goals Against: \(stats.goals.against)")
+            }
+        }
+        .padding()
     }
     
     private func aggregateRow(_ title: String, _ value: Int) -> some View {

@@ -20,14 +20,7 @@ struct MatchDetailScreen: View {
                 ProgressView()
             }
             else if let error = viewModel.errorMessage {
-                VStack {
-                    Image(systemName: "wifi.slash")
-                        .font(.system(size: 60))
-                        .padding()
-                    
-                    Text(error)
-                        .multilineTextAlignment(.center)
-                }
+                ErrorScreen(errorMessage: "Ooops! we were unable to get the data. Please try again later.")
             }
             else if let match = viewModel.selectedMatch {
                 ScrollView {

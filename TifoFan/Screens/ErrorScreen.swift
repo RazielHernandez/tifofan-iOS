@@ -10,10 +10,12 @@ import SwiftUI
 struct ErrorScreen: View {
     
     var errorMessage: String
+    var errorCode: String?
+    var errorCodeDescription: String?
     
     var body: some View {
         VStack {
-            Text("Ooops !!")
+            Text("Offside !")
                 .font(.largeTitle)
                 .bold()
             
@@ -25,6 +27,14 @@ struct ErrorScreen: View {
             
             Text("Something went wrong")
                 .font(.title)
+            
+            if ((errorCode) != nil) {
+                Text("Error code: \(errorCode ?? "0000")")
+            }
+            
+            if ((errorCodeDescription) != nil) {
+                Text("\(errorCodeDescription ?? "Unknown")")
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.accentColor)
@@ -33,5 +43,5 @@ struct ErrorScreen: View {
 
 
 #Preview {
-    ErrorScreen(errorMessage: "Something went wrong")
+    ErrorScreen(errorMessage: "Something went wrong", errorCode: "204", errorCodeDescription: "No connection")
 }
