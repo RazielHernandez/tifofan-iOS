@@ -9,101 +9,121 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @State private var notificationsEnabled = true
-        @State private var showVersionSheet = false
-        @State private var showClearCacheAlert = false
-        
-        var body: some View {
-            NavigationStack {
-                List {
+    @State private var showVersionSheet = false
+    @State private var showTerms = false
+    @State private var showPrivacy = false
+    @State private var showClearCacheAlert = false
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                
+                // MARK: - General
+                
+                Section("General") {
                     
-                    // MARK: - General
+                    Toggle("Notifications", isOn: $notificationsEnabled)
                     
-                    Section("General") {
-                        
-                        Toggle("Notifications", isOn: $notificationsEnabled)
-                        
-                        SettingsRow(
-                            icon: "moon.fill",
-                            title: "Dark Mode",
-                            subtitle: "System Default"
-                        )
-                        
-                        SettingsRow(
-                            icon: "star.fill",
-                            title: "Favorite Team"
-                        )
+                    SettingsRow(
+                        icon: "moon.fill",
+                        title: "Dark Mode",
+                        subtitle: "System Default"
+                    )
+                    
+                    SettingsRow(
+                        icon: "star.fill",
+                        title: "Favorite Team"
+                    )
+                }
+                
+                // MARK: - Data
+                
+                Section("Data") {
+                    
+                    Button {
+                        showClearCacheAlert = true
+                    } label: {
+                        Label("Clear Cache", systemImage: "trash")
+                            .foregroundColor(.red)
                     }
                     
-                    // MARK: - Data
+                    Button {
+                        
+                        // TODO: REFRESH API DATA
+                        print("Refresh data")
+                        
+                    } label: {
+                        Label("Refresh Data", systemImage: "arrow.clockwise")
+                    }
+                }
+                
+                // MARK: - About
+                
+                Section("About") {
                     
-                    Section("Data") {
-                        
-                        Button {
-                            showClearCacheAlert = true
-                        } label: {
-                            Label("Clear Cache", systemImage: "trash")
-                                .foregroundColor(.red)
-                        }
-                        
-                        Button {
-                            
-                            // TODO: REFRESH API DATA
-                            print("Refresh data")
-                            
-                        } label: {
-                            Label("Refresh Data", systemImage: "arrow.clockwise")
+                    Button {
+                        showVersionSheet = true
+                    } label: {
+                        HStack {
+                            Label("App Version", systemImage: "info.circle")
+                            Spacer()
+                            Text(appVersion)
+                                .foregroundColor(.gray)
                         }
                     }
                     
-                    // MARK: - About
-                    
-                    Section("About") {
-                        
-                        Button {
-                            showVersionSheet = true
-                        } label: {
-                            HStack {
-                                Label("App Version", systemImage: "info.circle")
-                                Spacer()
-                                Text(appVersion)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                        
+                    Button {
+                        showTerms = true
+                    } label: {
                         SettingsRow(
                             icon: "doc.text",
                             title: "Terms & Conditions"
                         )
-                        
+                    }
+                    
+                    Button {
+                        showPrivacy = true
+                    } label: {
                         SettingsRow(
                             icon: "lock.shield",
                             title: "Privacy Policy"
                         )
                     }
-                }
-                .navigationTitle("Settings")
-            }
-            .sheet(isPresented: $showVersionSheet) {
-                AboutSheet()
-            }
-            .alert("Clear Cache?", isPresented: $showClearCacheAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Clear", role: .destructive) {
-                    
-                    // TODO: CLEANING CACHE
-                    print("Cleaning cache")
                     
                 }
-            } message: {
-                Text("This will remove locally cached data.")
             }
+            .navigationTitle("Settings")
         }
-        
-        private var appVersion: String {
-            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-            let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-            return "v\(version) (\(build))"
+        // MARK: Sheets
+        .sheet(isPresented: $showVersionSheet) {
+            AboutSheet()
         }
+
+        .sheet(isPresented: $showTerms) {
+            TermsSheet()
+        }
+
+        .sheet(isPresented: $showPrivacy) {
+            PrivacySheet()
+        }
+        .alert("Clear Cache?", isPresented: $showClearCacheAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Clear", role: .destructive) {
+                
+                // TODO: CLEANING CACHE
+                print("Cleaning cache")
+                
+            }
+        } message: {
+            Text("This will remove locally cached data.")
+        }
+    }
+    
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "v\(version) (\(build))"
+    }
 }
 
 // MARK: Settings Row view
@@ -137,58 +157,6 @@ struct SettingsRow: View {
                 .foregroundColor(.gray)
         }
         .padding(.vertical, 4)
-    }
-}
-
-// MARK: About Sheet view
-struct AboutSheet: View {
-    
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                
-                Image(systemName: "soccerball")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80)
-                    .padding(.top)
-                
-                Text("TifoFan")
-                    .font(.largeTitle)
-                    .bold()
-                
-                Text("Your ultimate football companion.")
-                    .font(.headline)
-                    .multilineTextAlignment(.center)
-                
-                Divider()
-                
-                Text("""
-                This is a demo settings screen.
-                
-                Future versions will include:
-                • Push notifications
-                • Dark mode control
-                • Favorite teams
-                • Data management
-                """)
-                .multilineTextAlignment(.center)
-                .padding()
-                
-                Spacer()
-            }
-            .padding()
-            .navigationTitle("About")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-        }
     }
 }
 
