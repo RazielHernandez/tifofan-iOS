@@ -124,7 +124,7 @@ struct TeamHeaderView: View {
     
     var body: some View {
         VStack(spacing: 8) {
-            AsyncImage(url: URL(string: team.logo)) { image in
+            AsyncImage(url: team.logo) { image in
                 image.resizable()
             } placeholder: {
                 ProgressView()

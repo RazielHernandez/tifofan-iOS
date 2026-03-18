@@ -5,11 +5,13 @@
 //  Created by Puma Azteca on 2026-02-21.
 //
 
+import Foundation
+
 struct League: Codable, Identifiable {
     let id: Int
     let name: String
     let country: String
     let countryCode: String
     let fromSeason: Int
-    let logo: String
+    let logo: URL?
 }

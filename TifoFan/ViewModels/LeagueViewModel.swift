@@ -20,7 +20,9 @@ final class LeagueViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            leagues = try await FirebaseService.shared.getSupportedLeagues()
+            let response = try await FirebaseService.shared.getSupportedLeagues()
+            
+            leagues = response.data
         } catch {
             print("🔥 FULL ERROR:", error)
             errorMessage = error.localizedDescription

@@ -22,15 +22,13 @@ struct TeamScreen: View {
                     .foregroundColor(.red)
             }
             
-            else if let response = vm.response {
-                Text(response.team.name)
+            else if let response = vm.team {
+                Text(response.name)
                     .font(.title)
                 
-                if let logo = response.team.logo,
-                   let url = URL(string: logo) {
-                    AsyncImage(url: url)
-                        .frame(width: 80, height: 80)
-                }
+                AsyncImage(url: response.logo)
+                    .frame(width: 80, height: 80)
+                
             }
             
             else {

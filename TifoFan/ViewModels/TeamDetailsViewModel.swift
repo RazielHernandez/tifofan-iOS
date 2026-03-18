@@ -11,7 +11,7 @@ internal import Combine
 @MainActor
 final class TeamDetailsViewModel: ObservableObject {
     
-    @Published var response: TeamDetailsResponse?
+    @Published var teamDetail: TeamDetails?
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -24,12 +24,13 @@ final class TeamDetailsViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            response = try await FirebaseService.shared
+            let response = try await FirebaseService.shared
                 .getTeamDetails(
                     teamId: teamId,
                     leagueId: leagueId,
                     season: season
                 )
+            teamDetail = response.data
         } catch {
             errorMessage = error.localizedDescription
             print("🔥 FULL ERROR:", error)

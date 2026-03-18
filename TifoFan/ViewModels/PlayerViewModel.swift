@@ -11,7 +11,7 @@ internal import Combine
 @MainActor
 final class PlayerViewModel: ObservableObject {
     
-    @Published var response: PlayerResponse?
+    @Published var data: PlayerData?
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -20,8 +20,10 @@ final class PlayerViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            response = try await FirebaseService.shared
+            let response = try await FirebaseService.shared
                 .getPlayer(playerId: playerId, season: season)
+            
+            data = response.data
         } catch {
             errorMessage = error.localizedDescription
             print("🔥 FULL ERROR:", error)

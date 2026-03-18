@@ -69,9 +69,9 @@ final class TeamPlayersViewModel: ObservableObject {
                     page: currentPage
                 )
             
-            players.append(contentsOf: response.items)
+            players.append(contentsOf: response.data)
             pagination = response.pagination
-            hasNext = response.pagination.hasNext
+            hasNext = response.pagination?.hasNext ?? false
             
         } catch {
             errorMessage = error.localizedDescription

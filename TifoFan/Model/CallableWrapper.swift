@@ -7,6 +7,8 @@
 
 import Foundation
 
-struct CallableWrapper<T: Codable>: Codable {
-    let result: T
-}
+//struct CallableWrapper<T: Codable>: Codable {
+//    let result: T
+//}
+
+

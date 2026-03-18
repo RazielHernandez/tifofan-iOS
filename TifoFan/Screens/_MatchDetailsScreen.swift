@@ -41,7 +41,7 @@ struct MatchDetailScreen: View {
                                 
                                 // HOME
                                 VStack(spacing: 8) {
-                                    AsyncImage(url: URL(string: match.home.team.logo)) { image in
+                                    AsyncImage(url:  match.home.team.logo) { image in
                                         image.resizable()
                                     } placeholder: {
                                         ProgressView()
@@ -65,7 +65,7 @@ struct MatchDetailScreen: View {
                                 
                                 // AWAY
                                 VStack(spacing: 8) {
-                                    AsyncImage(url: URL(string: match.away.team.logo)) { image in
+                                    AsyncImage(url: match.away.team.logo) { image in
                                         image.resizable()
                                     } placeholder: {
                                         ProgressView()

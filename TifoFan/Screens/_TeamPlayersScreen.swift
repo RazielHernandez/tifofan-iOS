@@ -56,10 +56,9 @@ struct TeamPlayersScreen: View {
     private func playerRow(_ player: TeamPlayer) -> some View {
         HStack(spacing: 16) {
             
-            if let photo = player.photo,
-               let url = URL(string: photo) {
+            if let photo = player.photo {
                 
-                AsyncImage(url: url) { image in
+                AsyncImage(url: photo) { image in
                     image.resizable()
                 } placeholder: {
                     Circle().fill(Color.gray.opacity(0.3))

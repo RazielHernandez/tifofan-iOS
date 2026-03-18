@@ -9,7 +9,12 @@ import SwiftUI
 
 struct StatisticsScreen: View {
     var body: some View {
-        TeamDetailScreen(teamId: 2286, leagueId: 262, season: 2023)
+        // TeamDetailScreen(teamId: 2286, leagueId: 262, season: 2023)
+        // TeamPlayersScreen(teamId: 2286, leagueId: 262, season: 2023)
+        // PlayerScreen()
+        // TeamScreen()
+        // LeaguesScreen()
+        MatchDetailScreen()
     }
 }
 

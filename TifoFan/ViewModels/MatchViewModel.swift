@@ -32,7 +32,7 @@ final class MatchViewModel: ObservableObject {
                 page: page
             )
             
-            matches = response.items
+            matches = response.data
         } catch {
             errorMessage = error.localizedDescription
             print("🔥 FULL ERROR:", error)
@@ -54,7 +54,7 @@ final class MatchViewModel: ObservableObject {
         
         do {
             let response = try await service.getMatchDetail(matchId: matchId)
-            selectedMatch = response.item
+            selectedMatch = response.data
             
         } catch {
             errorMessage = error.localizedDescription
@@ -78,7 +78,7 @@ final class MatchViewModel: ObservableObject {
         
         do {
             let response = try await service.getMatchStatistics(matchId: matchId)
-            statistics = response.items
+            statistics = response.data
             
         } catch {
             errorMessage = error.localizedDescription

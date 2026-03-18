@@ -29,17 +29,16 @@ struct TeamDetailScreen: View {
                 )
             }
             
-            else if let response = vm.response {
+            else if let response = vm.teamDetail {
                 ScrollView {
                     VStack(spacing: 20) {
                         
                         // MARK: - Header
                         VStack(spacing: 12) {
                             
-                            if let logo = response.team.logo,
-                               let url = URL(string: logo) {
+                            if let logo = response.team.logo {
                                 
-                                AsyncImage(url: url) { image in
+                                AsyncImage(url: logo) { image in
                                     image.resizable()
                                 } placeholder: {
                                     ProgressView()
@@ -105,17 +104,16 @@ struct TeamDetailScreen: View {
     }
     
     @ViewBuilder
-    private func contentView(response: TeamDetailsResponse) -> some View {
+    private func contentView(response: TeamDetails) -> some View {
         
         VStack(spacing: 20) {
             
             // MARK: - Header
             VStack(spacing: 12) {
                 
-                if let logo = response.team.logo,
-                   let url = URL(string: logo) {
+                if let logo = response.team.logo {
                     
-                    AsyncImage(url: url) { image in
+                    AsyncImage(url: logo) { image in
                         image.resizable()
                     } placeholder: {
                         ProgressView()

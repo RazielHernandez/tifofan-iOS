@@ -29,7 +29,7 @@ struct PlayerScreen: View {
                         .multilineTextAlignment(.center)
                 }
             }
-            else if let data = viewModel.response {
+            else if let data = viewModel.data {
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -37,7 +37,7 @@ struct PlayerScreen: View {
                         // MARK: Player Header
                         VStack(spacing: 12) {
                             
-                            AsyncImage(url: URL(string: data.player.photo)) { image in
+                            AsyncImage(url: data.player.photo) { image in
                                 image.resizable()
                             } placeholder: {
                                 ProgressView()
@@ -109,7 +109,7 @@ struct CompetitionRow: View {
         VStack(alignment: .leading, spacing: 6) {
             
             HStack {
-                AsyncImage(url: URL(string: stat.team.logo)) { image in
+                AsyncImage(url: stat.team.logo) { image in
                     image.resizable()
                 } placeholder: {
                     ProgressView()
