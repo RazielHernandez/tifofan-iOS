@@ -24,7 +24,7 @@ struct TifoFanApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }

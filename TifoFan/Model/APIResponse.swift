@@ -26,16 +26,6 @@ struct Meta: Codable {
     let cached: Bool
 }
 
-//typealias MatchDetailResponse = APIResponse<MatchDetail>
-//
-//typealias MatchStatisticsResponse = APIResponse<[TeamMatchStatistics]>
-//
-//typealias TeamPlayersResponse = APIResponse<[TeamPlayer]>
-//
-//typealias MatchesResponse = APIResponse<[Match]>
-//
-//typealias TeamsResponse = APIResponse<[TeamSummary]>
-
 // MARK: - Teams
 
 typealias TeamResponse = APIResponse<TeamSummary>

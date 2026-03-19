@@ -7,58 +7,111 @@
 
 import SwiftUI
 
-struct SignUp: View {
+struct SignUpScreen: View {
+    
+    @EnvironmentObject var vm: AuthViewModel
+    var onSwitch: () -> Void
+    
     var body: some View {
-        
-        @State var email: String = ""
-        @State var confirmEmail: String = ""
-        @State var password: String = ""
-        @State var confirmPassword: String = ""
-        
         VStack {
+            Spacer()
             
-            
-            Image("TifoFan")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 200, height: 200)
+            VStack(spacing: 16) {
+                
+                Text("Sign Up")
+                    .font(.title)
+                    .bold()
+                
+                TextField("Email", text: $vm.email)
+                    .textFieldStyle(.roundedBorder)
+                
+                SecureField("Password", text: $vm.password)
+                    .textFieldStyle(.roundedBorder)
+                
+                SecureField("Confirm Password", text: $vm.confirmPassword)
+                    .textFieldStyle(.roundedBorder)
+                
+                Button {
+                    Task { await vm.signUp() }
+                } label: {
+                    if vm.isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Text("Create Account")
+                            .frame(maxWidth: .infinity)
+                    }
+                }
                 .padding()
-                .background(Color(.systemGray6))
+                .background(vm.isSignupValid ? Color.green : Color.gray)
+                .foregroundColor(.white)
                 .cornerRadius(10)
-                .padding()
-                .shadow(radius: 10)
-                .padding()
+                .disabled(!vm.isSignupValid)
+                
+                HStack {
+                    Text("Already have an account?")
+                    Button("Sign In") {
+                        onSwitch()
+                    }
+                }
+                .font(.footnote)
+                
+                if let error = vm.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .font(.caption)
+                }
+            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .padding()
             
             Spacer()
-            
-            Text("eMail")
-            TextField("Email", text: $email)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            Text("Confirm email")
-            TextField("Confirm Email", text: $confirmEmail)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            Text("Password")
-            TextField("Password", text: $password)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            Text("Confirm password")
-            TextField("Confirm password", text: $confirmPassword)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            
-            Spacer()
-            
         }
     }
 }
 
-
-#Preview {
-    SignUp()
+#Preview("Sign Up - Default") {
+    SignUpScreen(onSwitch: {})
+        .environmentObject(AuthViewModel(service: MockAuthService()))
 }
+
+#Preview("Sign Up - Valid") {
+    let vm = AuthViewModel(service: MockAuthService())
+    vm.email = "test@email.com"
+    vm.password = "123456"
+    vm.confirmPassword = "123456"
+    
+    return SignUpScreen(onSwitch: {})
+        .environmentObject(vm)
+}
+
+#Preview("Sign Up - Error") {
+    let vm = AuthViewModel(service: MockAuthService())
+    vm.errorMessage = "Email already in use"
+    
+    return SignUpScreen(onSwitch: {})
+        .environmentObject(vm)
+}
+
+#Preview("Sign Up - Loading") {
+    let vm = AuthViewModel(service: MockAuthService())
+    vm.isLoading = true
+    
+    return SignUpScreen(onSwitch: {})
+        .environmentObject(vm)
+}
+
+#Preview("Sign Up - Invalid") {
+    let vm = AuthViewModel(service: MockAuthService())
+    vm.email = "test@email.com"
+    vm.password = "123"
+    vm.confirmPassword = "456"
+    
+    return SignUpScreen(onSwitch: {})
+        .environmentObject(vm)
+}
+
+
