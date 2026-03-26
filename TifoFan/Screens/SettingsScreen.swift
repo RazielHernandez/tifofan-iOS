@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct SettingsScreen: View {
+    
+    @EnvironmentObject var authVM: AuthViewModel
+    
     @State private var notificationsEnabled = true
     @State private var showVersionSheet = false
     @State private var showTerms = false
     @State private var showPrivacy = false
     @State private var showClearCacheAlert = false
+    @State private var showLogoutAlert = false
     
     var body: some View {
         NavigationStack {
@@ -91,6 +95,20 @@ struct SettingsScreen: View {
                     }
                     
                 }
+                
+                // MARK: - Account
+
+                Section {
+                    Button(role: .destructive) {
+                        showLogoutAlert = true
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Label("Log Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            Spacer()
+                        }
+                    }
+                }
             }
             .navigationTitle("Settings")
         }
@@ -116,6 +134,12 @@ struct SettingsScreen: View {
             }
         } message: {
             Text("This will remove locally cached data.")
+        }
+        .alert("Log out?", isPresented: $showLogoutAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Log Out", role: .destructive) {
+                authVM.signOut()
+            }
         }
     }
     

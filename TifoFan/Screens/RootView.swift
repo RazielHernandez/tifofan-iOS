@@ -15,6 +15,7 @@ struct RootView: View {
         Group {
             if vm.isLoggedIn {
                 ContentView()
+                    .environmentObject(vm)
             } else {
                 AuthContainerView()
                     .environmentObject(vm)
@@ -30,7 +31,9 @@ struct AuthContainerView: View {
     
     var body: some View {
         ZStack {
-            Image("SampleBackgroundB")
+            Image("SampleBackgroundA")
+                .resizable()
+                .ignoresSafeArea()
             
             if isLogin {
                 SignInScreen(
@@ -42,5 +45,6 @@ struct AuthContainerView: View {
                 )
             }
         }
+        
     }
 }
