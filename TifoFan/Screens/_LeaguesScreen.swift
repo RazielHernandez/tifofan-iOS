@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LeaguesScreen: View {
+struct LeaguesScreenTest: View {
     @StateObject private var viewModel = LeagueViewModel()
         
     var body: some View {
@@ -42,5 +42,5 @@ struct LeaguesScreen: View {
 }
 
 #Preview {
-    LeaguesScreen()
+    LeaguesScreenTest()
 }

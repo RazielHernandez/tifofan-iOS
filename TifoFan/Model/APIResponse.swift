@@ -29,6 +29,7 @@ struct Meta: Codable {
 // MARK: - Teams
 
 typealias TeamResponse = APIResponse<TeamSummary>
+typealias TeamsInLeagueResponse = APIResponse<[TeamSummary]>
 typealias TeamDetailsResponse = APIResponse<TeamDetails>
 typealias TeamPlayersResponse = APIResponse<[TeamPlayer]>
 

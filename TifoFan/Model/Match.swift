@@ -7,14 +7,6 @@
 
 import Foundation
 
-// MARK: - Matches List Response
-
-//struct MatchesResponse: Codable {
-//    let items: [Match]
-//    let pagination: Pagination
-//    let cached: Bool
-//}
-
 // MARK: - Match
 
 struct Match: Codable, Identifiable {
@@ -31,36 +23,3 @@ struct MatchSide: Codable {
     let team: TeamSummary
     let goals: Int
 }
-
-//struct Match: Codable, Identifiable {
-//    let id: Int
-//    let leagueId: Int
-//    let season: Int
-//    let date: Date
-//    let status: String
-//    let home: MatchSide
-//    let away: MatchSide
-//}
-//
-//// MARK: - Shared Models
-//
-//struct MatchSide: Codable {
-//    let team: TeamSummary
-//    let goals: Int
-//}
-
-// MARK: - Meta
-
-//struct Meta: Codable {
-//    let timestamp: Int
-//    let cached: Bool
-//    let pagination: Pagination?
-//}
-//
-//struct Pagination: Codable {
-//    let page: Int
-//    let perPage: Int
-//    let totalItems: Int?
-//    let totalPages: Int
-//    let hasNext: Bool
-//}

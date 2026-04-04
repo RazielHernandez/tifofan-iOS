@@ -224,6 +224,20 @@ extension FirebaseService {
             responseType: SupportedLeaguesResponse.self
         )
     }
+    
+    func getTeamsByLeague(
+        league: Int,
+        season: Int,
+    ) async throws -> TeamsInLeagueResponse {
+        try await callFunction(
+            name: "v1-getTeamsByLeagueCallable",
+            data: [
+                "league": league,
+                "season": season,
+            ],
+            responseType: TeamsInLeagueResponse.self
+        )
+    }
 }
 
 extension FirebaseService {

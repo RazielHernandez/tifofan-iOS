@@ -16,13 +16,16 @@ struct ContentView: View {
                 DashboardScreen()
             }
             
-            
             Tab("My Club", systemImage: "soccerball") {
                 MyClubScreen()
             }
             
             Tab("Statistics", systemImage: "chart.bar") {
                 StatisticsScreen()
+            }
+            
+            Tab("Leagues", systemImage: "soccerball") {
+                LeaguesScreen()
             }
             
             Tab("Settings", systemImage: "gearshape") {
