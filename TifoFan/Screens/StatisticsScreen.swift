@@ -13,8 +13,8 @@ struct StatisticsScreen: View {
         // TeamPlayersScreen(teamId: 2286, leagueId: 262, season: 2023)
         // PlayerScreen()
         // TeamScreen()
-        // LeaguesScreen()
-        MatchDetailScreen()
+        LeaguesScreen()
+        // MatchDetailScreen()
     }
 }
 

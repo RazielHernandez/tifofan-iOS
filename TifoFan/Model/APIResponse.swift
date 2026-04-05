@@ -46,3 +46,19 @@ typealias PlayerResponse = APIResponse<PlayerData>
 // MARK: - Leagues
 
 typealias SupportedLeaguesResponse = APIResponse<[League]>
+
+struct FlexibleDouble: Codable {
+    let value: Double?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+
+        if let double = try? container.decode(Double.self) {
+            value = double
+        } else if let string = try? container.decode(String.self) {
+            value = Double(string)
+        } else {
+            value = nil
+        }
+    }
+}

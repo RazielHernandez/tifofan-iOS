@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MatchDetailScreen: View {
+struct MatchDetailScreenTest: View {
     
     @StateObject private var viewModel = MatchViewModel()
         
@@ -137,5 +137,5 @@ struct InfoRow: View {
 }
 
 #Preview {
-    MatchDetailScreen()
+    MatchDetailScreenTest()
 }
