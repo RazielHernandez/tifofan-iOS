@@ -67,8 +67,7 @@ struct LeagueDetailView: View {
             case .teams:
                 TeamsView(league: league, vm: LeagueViewModel())
             case .standings:
-                Text("Standings coming soon")
-                Spacer()
+                StandingsScreen(leagueId: league.id, season: 2025, vm: StandingsViewModel())
             case .fixtures:
                 FixturesView(league: league, vm: MatchViewModel())
                 Spacer()

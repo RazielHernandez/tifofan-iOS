@@ -18,7 +18,7 @@ struct TeamDetailsScreen: View {
     let leagueId: Int
     
     @StateObject private var vm = TeamDetailsViewModel()
-    @State private var selectedTab: TeamTab = .overview
+    @State private var selectedTab: TeamTab = .players
     
     private let season = 2024
     

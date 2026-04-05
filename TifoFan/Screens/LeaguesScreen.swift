@@ -11,15 +11,12 @@ struct LeaguesScreen: View {
     
     @StateObject private var viewModel = LeagueViewModel()
     
-    
     var body: some View {
         NavigationView{
             if viewModel.isLoading {
                 ProgressView()
             } else if let error = viewModel.errorMessage {
-                
                 ErrorScreen(errorMessage: error)
-                
             } else {
                 List(viewModel.leagues) { league in
                     NavigationLink {
@@ -51,7 +48,6 @@ struct LeaguesScreen: View {
         }
     }
 }
-
 
 #Preview {
     LeaguesScreen()
