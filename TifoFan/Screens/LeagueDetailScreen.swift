@@ -11,7 +11,6 @@ enum LeagueTab: String, CaseIterable {
     case teams = "Teams"
     case standings = "Standings"
     case fixtures = "Fixtures"
-    case stats = "Stats"
     case news = "News"
 }
 
@@ -33,12 +32,12 @@ struct LeagueDetailView: View {
                 }
                 .frame(width: 80, height: 80)
                 
-                Text(league.name)
-                    .font(.title2)
-                    .bold()
-                
-                Text(league.country)
-                    .foregroundColor(.gray)
+//                Text(league.name)
+//                    .font(.title2)
+//                    .bold()
+//                
+//                Text(league.country)
+//                    .foregroundColor(.gray)
             }
             .padding()
             
@@ -70,10 +69,6 @@ struct LeagueDetailView: View {
                 StandingsScreen(leagueId: league.id, season: 2025, vm: StandingsViewModel())
             case .fixtures:
                 FixturesView(league: league, vm: MatchViewModel())
-                Spacer()
-            case .stats:
-                Text("Stats coming soon")
-                Spacer()
             case .news:
                 Text("News coming soon")
                 Spacer()
@@ -95,12 +90,24 @@ struct FixturesView: View {
     var body: some View {
         Group {
             if vm.isLoading {
-                ProgressView()
+                VStack {
+                    Spacer()
+                    
+                    ProgressView()
+                    
+                    Spacer()
+                }
             } else if let error = vm.errorMessage {
                 Text(error)
             } else {
+                
                 List(vm.matches) { match in
-                    MatchRow(match: match)
+                    
+                    NavigationLink {
+                        MatchDetailScreen(matchId: match.id)
+                    } label: {
+                        MatchRow(match: match)
+                    }
                 }
             }
         }
@@ -160,19 +167,22 @@ struct TeamPlayersListView: View {
                 LazyVStack {
                     
                     ForEach(vm.players) { player in
-                        PlayerRow(player: player)
-                            .onAppear {
-                                // Pagination trigger
-                                if player.id == vm.players.last?.id {
-                                    Task {
-                                        await vm.fetchNextPage(
-                                            teamId: teamId,
-                                            leagueId: leagueId,
-                                            season: season
-                                        )
-                                    }
+                        NavigationLink {
+                            PlayerDetailScreen(playerId: player.id)
+                        } label: {
+                            PlayerRow(player: player)
+                        }
+                        .onAppear {
+                            if player.id == vm.players.last?.id {
+                                Task {
+                                    await vm.fetchNextPage(
+                                        teamId: teamId,
+                                        leagueId: leagueId,
+                                        season: season
+                                    )
                                 }
                             }
+                        }
                     }
                     
                     if vm.isLoading {
@@ -244,20 +254,3 @@ struct PlayersSection: View {
         }
     }
 }
-
-struct PlayerRow: View {
-    
-    let player: TeamPlayer
-    
-    var body: some View {
-        HStack {
-            Text(player.name)
-            Spacer()
-            Text(player.position ?? "")
-                .foregroundColor(.gray)
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-

@@ -63,5 +63,4 @@ struct PlayerData: Codable {
     let season: Int
     let stats: [PlayerSeasonStats]
     let aggregates: PlayerAggregates
-    let cached: Bool
 }

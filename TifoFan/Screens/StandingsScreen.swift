@@ -18,8 +18,13 @@ struct StandingsScreen: View {
         VStack {
             
             if vm.isLoading {
-                ProgressView()
-                
+                VStack {
+                    Spacer()
+                    
+                    ProgressView()
+                    
+                    Spacer()
+                }
             } else if let error = vm.errorMessage {
                 Text(error)
                     .foregroundColor(.red)

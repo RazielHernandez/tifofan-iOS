@@ -66,6 +66,7 @@ struct MatchDetailScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await vm.fetchMatchDetail(matchId: matchId)
+            await vm.fetchMatchStatistics(matchId: matchId)
         }
     }
 }

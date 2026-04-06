@@ -17,9 +17,15 @@ struct TeamsView: View {
     var body: some View {
         Group {
             if vm.isLoading {
-                ProgressView()
+                VStack {
+                    Spacer()
+                    
+                    ProgressView()
+                    
+                    Spacer()
+                }
             } else if let error = vm.errorMessage {
-                Text(error)
+                ErrorScreen(errorMessage: error)
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
