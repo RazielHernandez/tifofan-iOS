@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TeamDetailScreen: View {
+struct TeamDetailScreenTest: View {
     
     let teamId: Int
     let leagueId: Int
@@ -174,5 +174,5 @@ struct TeamDetailScreen: View {
 }
 
 #Preview {
-    TeamDetailScreen(teamId: 2286, leagueId: 262, season: 2023)
+    TeamDetailScreenTest(teamId: 2286, leagueId: 262, season: 2023)
 }

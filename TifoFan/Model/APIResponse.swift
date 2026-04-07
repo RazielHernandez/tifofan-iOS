@@ -62,3 +62,17 @@ struct FlexibleDouble: Codable {
         }
     }
 }
+
+
+extension FlexibleDouble {
+    
+    func formatted(_ decimals: Int = 1) -> String {
+        guard let value = value else { return "-" }
+        return String(format: "%.\(decimals)f", value)
+    }
+    
+    func percentage(_ decimals: Int = 1) -> String {
+        guard let value = value else { return "-" }
+        return String(format: "%.\(decimals)f%%", value)
+    }
+}

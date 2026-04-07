@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+enum StandingMode: String, CaseIterable {
+    case all = "All"
+    case home = "Home"
+    case away = "Away"
+}
+
 struct StandingsScreen: View {
     
     let leagueId: Int
@@ -14,72 +20,223 @@ struct StandingsScreen: View {
     
     @ObservedObject var vm: StandingsViewModel
     
+    @State private var mode: StandingMode = .all
+    
     var body: some View {
         VStack {
             
-            if vm.isLoading {
-                VStack {
-                    Spacer()
-                    
-                    ProgressView()
-                    
-                    Spacer()
+            // 🔥 Tabs
+            HStack {
+                ForEach(StandingMode.allCases, id: \.self) { m in
+                    Button {
+                        mode = m
+                    } label: {
+                        Text(m.rawValue)
+                            .font(.subheadline)
+                            .foregroundColor(mode == m ? .white : .blue)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(mode == m ? Color.blue : Color.clear)
+                            .cornerRadius(8)
+                    }
                 }
-            } else if let error = vm.errorMessage {
-                Text(error)
-                    .foregroundColor(.red)
+            }
+            .padding(.horizontal)
+            
+            Divider()
+            
+            if vm.isLoading {
+                Spacer()
+                ProgressView()
+                Spacer()
                 
+            } else if let error = vm.errorMessage {
+                
+                ErrorScreen(errorMessage: error)
             } else {
                 
                 ScrollView {
-                    LazyVStack(spacing: 12) {
+                    LazyVStack(spacing: 8) {
+                        
+                        StandingsHeader()
                         
                         ForEach(vm.standings) { row in
-                            
-                            HStack(spacing: 12) {
-                                
-                                // Rank
-                                Text("\(row.rank)")
-                                    .frame(width: 30, alignment: .leading)
-                                
-                                // Team logo
-                                AsyncImage(url: row.team.logo) { phase in
-                                    switch phase {
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFit()
-                                    case .failure(_):
-                                        Image(systemName: "photo")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .opacity(0.5)
-                                    default:
-                                        ProgressView()
-                                    }
-                                }
-                                .frame(width: 24, height: 24)
-                                
-                                // Team name
-                                Text(row.team.name)
-                                    .lineLimit(1)
-                                
-                                Spacer()
-                                
-                                // Points
-                                Text("\(row.points)")
-                                    .bold()
-                                    .frame(width: 40, alignment: .trailing)
-                            }
-                            .padding(.vertical, 6)
+                            StandingsRowView(row: row, mode: mode, leagueId: leagueId)
+                            Divider()
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
                 }
             }
         }
+        .navigationTitle("Standings")
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             await vm.fetchStandings(league: leagueId, season: season)
+        }
+    }
+}
+
+struct StandingsHeader: View {
+    var body: some View {
+        HStack {
+            Text("#").frame(width: 30, alignment: .leading)
+            Text("Team").frame(maxWidth: .infinity, alignment: .leading)
+            Text("P").frame(width: 30)
+            Text("W").frame(width: 30)
+            Text("D").frame(width: 30)
+            Text("L").frame(width: 30)
+            Text("GF").frame(width: 40)
+            Text("GA").frame(width: 40)
+            Text("GD").frame(width: 40)
+            Text("Pts").frame(width: 40)
+        }
+        .font(.caption)
+        .foregroundColor(.gray)
+    }
+}
+
+struct StandingsRowView: View {
+    
+    let row: StandingsRow
+    let mode: StandingMode
+    let leagueId: Int
+    
+    var stats: Stats {
+        switch mode {
+        case .all:
+            return row.all
+        case .home:
+            return Stats(
+                played: row.home.played,
+                win: row.home.win,
+                draw: row.home.draw,
+                lose: row.home.lose,
+                goalsFor: 0,
+                goalsAgainst: 0
+            )
+        case .away:
+            return Stats(
+                played: row.away.played,
+                win: row.away.win,
+                draw: row.away.draw,
+                lose: row.away.lose,
+                goalsFor: 0,
+                goalsAgainst: 0
+            )
+        }
+    }
+    
+    var body: some View {
+        NavigationLink {
+            // TeamDetailScreen(teamId: row.team.id, leagueId: leagueId, season: 2023)
+            TeamDetailsScreen(team: row.team, leagueId: leagueId)
+        } label: {
+            content
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            
+            HStack {
+                
+                // Rank with color indicator
+                HStack(spacing: 4) {
+                    Rectangle()
+                        .fill(rankColor)
+                        .frame(width: 4)
+                    
+                    Text("\(row.rank)")
+                        .frame(width: 26)
+                        .fontWeight(.bold)
+                }
+                
+                AsyncImage(url: row.team.logo) { image in
+                    image.resizable()
+                } placeholder: {
+                    Color.gray.opacity(0.2)
+                }
+                .frame(width: 24, height: 24)
+                
+                Text(row.team.name)
+                    .lineLimit(1)
+                
+                Spacer()
+                
+                Text("\(stats.played)").frame(width: 30)
+                Text("\(stats.win)").frame(width: 30)
+                Text("\(stats.draw)").frame(width: 30)
+                Text("\(stats.lose)").frame(width: 30)
+                
+                Text("\(stats.goalsFor)").frame(width: 40)
+                Text("\(stats.goalsAgainst)").frame(width: 40)
+                
+                Text("\(row.goalsDiff)")
+                    .frame(width: 40)
+                    .foregroundColor(row.goalsDiff >= 0 ? .green : .red)
+                
+                Text("\(row.points)")
+                    .frame(width: 40)
+                    .bold()
+            }
+            
+            // FORM (only in ALL)
+            if let form = row.form, mode == .all {
+                HStack(spacing: 4) {
+//                    ForEach(Array(form), id: \.self) { char in
+//                        Text(String(char))
+//                            .font(.caption2)
+//                            .frame(width: 18, height: 18)
+//                            .background(color(for: char))
+//                            .foregroundColor(.white)
+//                            .clipShape(Circle())
+//                    }
+                    ForEach(Array(form.enumerated()), id: \.offset) { index, char in
+                        Text(String(char))
+                            .font(.caption2)
+                            .frame(width: 18, height: 18)
+                            .background(color(for: char))
+                            .foregroundColor(.white)
+                            .clipShape(Circle())
+                    }
+                }
+                .padding(.leading, 30)
+            }
+        }
+        .padding(.vertical, 6)
+        .background(rowBackground)
+        .cornerRadius(8)
+    }
+    
+    // 🔥 Rank coloring logic
+    private var rankColor: Color {
+        if row.rank <= 4 {
+            return .green // Champions / playoffs
+        } else if row.rank >= 16 {
+            return .red // Relegation
+        } else {
+            return .clear
+        }
+    }
+    
+    private var rowBackground: Color {
+        if row.rank <= 4 {
+            return Color.green.opacity(0.08)
+        } else if row.rank >= 16 {
+            return Color.red.opacity(0.08)
+        } else {
+            return Color.clear
+        }
+    }
+    
+    func color(for char: Character) -> Color {
+        switch char {
+        case "W": return .green
+        case "L": return .red
+        case "D": return .gray
+        default: return .clear
         }
     }
 }
