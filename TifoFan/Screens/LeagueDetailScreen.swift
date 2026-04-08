@@ -120,33 +120,6 @@ struct FixturesView: View {
     }
 }
 
-struct MatchRow: View {
-    
-    let match: Match
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            
-            HStack {
-                Text(match.home.team.name)
-                Spacer()
-                Text("\(match.home.goals)")
-            }
-            
-            HStack {
-                Text(match.away.team.name)
-                Spacer()
-                Text("\(match.away.goals)")
-            }
-            
-            Text(match.date, style: .date)
-                .font(.caption)
-                .foregroundColor(.gray)
-        }
-        .padding()
-    }
-}
-
 struct TeamPlayersListView: View {
     
     let teamId: Int
