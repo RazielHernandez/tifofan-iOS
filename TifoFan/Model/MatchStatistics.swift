@@ -22,8 +22,8 @@ struct MatchStatistics: Codable {
     let corners: Int?
     let offsides: Int?
     let possession: Int?
-    let yellowCards: Int?
-    let redCards: Int?
+    let yellowCards: FlexibleInt?
+    let redCards: FlexibleInt?
     let passes: Int?
     let passAccuracy: Int?
 }

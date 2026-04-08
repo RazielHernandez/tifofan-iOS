@@ -81,14 +81,14 @@ struct MatchStatisticsScreen: View {
                             
                             StatRow(
                                 title: "Yellow Cards",
-                                homeValue: value(home.stats.yellowCards),
-                                awayValue: value(away.stats.yellowCards)
+                                homeValue: value(home.stats.yellowCards?.value),
+                                awayValue: value(away.stats.yellowCards?.value)
                             )
                             
                             StatRow(
                                 title: "Red Cards",
-                                homeValue: value(home.stats.redCards),
-                                awayValue: value(away.stats.redCards)
+                                homeValue: value(home.stats.redCards?.value),
+                                awayValue: value(away.stats.redCards?.value)
                             )
                             
                             StatRow(

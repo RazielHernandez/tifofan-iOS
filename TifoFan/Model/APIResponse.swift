@@ -76,3 +76,20 @@ extension FlexibleDouble {
         return String(format: "%.\(decimals)f%%", value)
     }
 }
+
+struct FlexibleInt: Codable {
+    let value: Int?
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        
+        if let int = try? container.decode(Int.self) {
+            value = int
+        } else if let string = try? container.decode(String.self),
+                  string != "<null>" {
+            value = Int(string)
+        } else {
+            value = nil
+        }
+    }
+}
