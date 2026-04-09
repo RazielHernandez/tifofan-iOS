@@ -192,5 +192,15 @@ extension FirebaseService {
             responseType: MatchStatisticsResponse.self
         )
     }
+    
+    func getMatchLineups(
+        matchId: Int
+    ) async throws -> MatchLineupResponse {
+        try await callFunction(
+            name: "v1-getMatchLineupsCallable",
+            data: ["fixture": matchId],
+            responseType: MatchLineupResponse.self
+        )
+    }
 }
 

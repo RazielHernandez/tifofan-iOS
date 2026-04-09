@@ -78,3 +78,48 @@ struct TeamAggregates: Codable {
     let goalsForPerMatch: FlexibleDouble
     let goalsAgainstPerMatch: FlexibleDouble
 }
+
+
+// ========================= LINEUPS ===============================
+
+struct TeamLineup: Codable, Identifiable {
+    let id = UUID()
+    
+    let team: TeamWithColors
+    let coach: Coach
+    let formation: String
+    let startXI: [LineupPlayer]
+    let substitutes: [LineupPlayer]
+}
+
+struct TeamWithColors: Codable {
+    let id: Int
+    let name: String
+    let logo: URL?
+    let colors: TeamColors?
+}
+
+struct TeamColors: Codable {
+    let player: ColorSet?
+    let goalkeeper: ColorSet?
+}
+
+struct ColorSet: Codable {
+    let primary: String?
+    let number: String?
+    let border: String?
+}
+
+struct Coach: Codable {
+    let id: Int
+    let name: String
+    let photo: URL?
+}
+
+struct LineupPlayer: Codable, Identifiable {
+    let id: Int
+    let name: String
+    let number: Int?
+    let position: String?
+    let grid: String?
+}

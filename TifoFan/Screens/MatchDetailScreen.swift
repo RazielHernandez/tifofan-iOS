@@ -57,7 +57,7 @@ struct MatchDetailScreen: View {
                     case .stats:
                         StatsMatchView(stats: vm.statistics)
                     case .lineups:
-                        Text("Lineups coming soon")
+                        LineupsView(matchId: matchId)
                     }
                 }
             }
@@ -180,18 +180,6 @@ struct StatsMatchView: View {
         .padding()
     }
     
-//    private func statItems() -> [StatItemModel] {
-//        guard stats.count == 2 else { return [] }
-//        
-//        let home = stats[0]
-//        let away = stats[1]
-//        
-//        return [
-//            StatItemModel(title: "Shots", home: home.stats.shotsOnGoal ?? 0, away: away.stats.shotsOnGoal ?? 0),
-//            StatItemModel(title: "Possession", home: home.stats.possession ?? 0,  away: away.stats.possession ?? 0),
-//            StatItemModel(title: "Passes", home: home.stats.passes ?? 0, away: away.stats.passes ?? 0)
-//        ]
-//    }
     private func statItems() -> [StatItemModel] {
         guard stats.count == 2 else { return [] }
         
@@ -228,43 +216,6 @@ struct StatItemModel: Identifiable {
         self.isPercentage = isPercentage
     }
 }
-
-//struct StatBarRow: View {
-//    
-//    let title: String
-//    let homeValue: Int
-//    let awayValue: Int
-//    
-//    var body: some View {
-//        VStack {
-//            
-//            HStack {
-//                Text("\(homeValue)")
-//                Spacer()
-//                Text(title)
-//                Spacer()
-//                Text("\(awayValue)")
-//            }
-//            
-//            GeometryReader { geo in
-//                HStack(spacing: 0) {
-//                    
-//                    Rectangle()
-//                        .frame(width: barWidth(total: geo.size.width, value: homeValue))
-//                    
-//                    Rectangle()
-//                        .frame(width: barWidth(total: geo.size.width, value: awayValue))
-//                }
-//            }
-//            .frame(height: 8)
-//        }
-//    }
-//    
-//    private func barWidth(total: CGFloat, value: Int) -> CGFloat {
-//        let sum = max(homeValue + awayValue, 1)
-//        return total * CGFloat(value) / CGFloat(sum)
-//    }
-//}
 
 struct StatBarRow: View {
     
@@ -389,5 +340,227 @@ struct StatBarRow: View {
             startPoint: .leading,
             endPoint: .trailing
         )
+    }
+}
+
+struct LineupsView: View {
+    
+    let matchId: Int
+    @StateObject private var vm = LineupViewModel()
+    
+    var body: some View {
+        VStack {
+            
+            if vm.isLoading {
+                ProgressView()
+            } else if vm.lineups.count == 2 {
+                
+                ScrollView {
+                    VStack(spacing: 16) {
+                        FormationView(
+                            home: vm.lineups[0],
+                            away: vm.lineups[1]
+                        )
+                        
+                        Divider().padding(.vertical)
+                        
+                        SubstitutesView(
+                            homeSubs: vm.lineups[0].substitutes,
+                            awaySubs: vm.lineups[1].substitutes
+                        )
+                    }
+                    .padding(.bottom, 20)
+                }
+                
+                
+            }
+        }
+        .task {
+            await vm.fetchLineups(matchId: matchId)
+        }
+    }
+}
+
+struct FormationView: View {
+    
+    let home: TeamLineup
+    let away: TeamLineup
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            
+            Text("Formation")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.horizontal)
+            
+            ZStack {
+                
+                // FIELD
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.green.opacity(0.8), Color.green.opacity(0.5)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                
+                VStack {
+                    
+                    // AWAY TEAM (top)
+                    PlayersGrid(players: away.startXI, isHome: false)
+                    
+                    Spacer()
+                    
+                    Divider()
+                        .background(Color.white)
+                    
+                    Spacer()
+                    
+                    // HOME TEAM (bottom)
+                    PlayersGrid(players: home.startXI, isHome: true)
+                }
+                .padding()
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+        }
+        .padding()
+    }
+}
+
+struct PlayersGrid: View {
+    
+    let players: [LineupPlayer]
+    let isHome: Bool
+    
+    var grouped: [Int: [LineupPlayer]] {
+        Dictionary(grouping: players) { player in
+            Int(player.grid?.split(separator: ":").first ?? "0") ?? 0
+        }
+    }
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            ForEach(grouped.keys.sorted(), id: \.self) { row in
+                
+                HStack(spacing: 12) {
+                    ForEach(grouped[row] ?? []) { player in
+                        PlayerView(player: player, isHome: isHome)
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct PlayerView: View {
+    
+    let player: LineupPlayer
+    let isHome: Bool
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            
+            Text("\(player.number ?? 0)")
+                .font(.caption)
+                .bold()
+                .frame(width: 28, height: 28)
+                .background(isHome ? Color.blue : Color.red)
+                .foregroundColor(.white)
+                .clipShape(Circle())
+            
+            Text(shortName(player.name))
+                .font(.caption2)
+                .foregroundColor(.white)
+                .lineLimit(1)
+        }
+    }
+    
+    private func shortName(_ name: String) -> String {
+        let parts = name.split(separator: " ")
+        if parts.count > 1 {
+            return "\(parts.first!.prefix(1)). \(parts.last!)"
+        }
+        return name
+    }
+}
+
+struct SubstitutesView: View {
+    
+    let homeSubs: [LineupPlayer]
+    let awaySubs: [LineupPlayer]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            
+            Text("Substitutes")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.horizontal)
+            
+            HStack(alignment: .top, spacing: 12) {
+                
+                // HOME
+                VStack(spacing: 8) {
+                    ForEach(homeSubs) { player in
+                        PlayerLineupRow(player: player, alignment: .leading)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                
+                // AWAY
+                VStack(spacing: 8) {
+                    ForEach(awaySubs) { player in
+                        PlayerLineupRow(player: player, alignment: .trailing)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(.systemBackground))
+                    .shadow(radius: 4)
+            )
+            .padding(.horizontal)
+        }
+    }
+}
+
+struct PlayerLineupRow: View {
+    
+    let player: LineupPlayer
+    let alignment: HorizontalAlignment
+    
+    var body: some View {
+        HStack {
+            
+            if alignment == .leading {
+                number
+                name
+                Spacer()
+            } else {
+                Spacer()
+                name
+                number
+            }
+        }
+        .font(.subheadline)
+    }
+    
+    private var number: some View {
+        Text("\(player.number ?? 0)")
+            .font(.caption)
+            .fontWeight(.bold)
+            .frame(width: 28, height: 28)
+            .background(Color.blue.opacity(0.15))
+            .clipShape(Circle())
+    }
+    
+    private var name: some View {
+        Text(player.name)
+            .lineLimit(1)
     }
 }

@@ -38,6 +38,7 @@ typealias TeamPlayersResponse = APIResponse<[TeamPlayer]>
 typealias MatchesResponse = APIResponse<[Match]>
 typealias MatchDetailResponse = APIResponse<MatchDetail>
 typealias MatchStatisticsResponse = APIResponse<[TeamMatchStatistics]>
+typealias MatchLineupResponse = APIResponse<[TeamLineup]>
 
 // MARK: - Players
 
