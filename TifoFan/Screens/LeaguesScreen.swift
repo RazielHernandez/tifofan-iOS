@@ -16,7 +16,7 @@ struct LeaguesScreen: View {
         NavigationView {
             
             Group {
-                if viewModel.isLoading {
+                if viewModel.isLoading || favoritesVM.isLoading {
                     ProgressView()
                     
                 } else if let error = viewModel.errorMessage {

@@ -10,6 +10,8 @@ import SwiftUI
 struct TeamRow: View {
     
     let team: TeamSummary
+    let isFavorite: Bool
+    let onFavoriteTap: () -> Void
     
     var body: some View {
         HStack(spacing: 12) {
@@ -25,6 +27,14 @@ struct TeamRow: View {
                 .font(.headline)
             
             Spacer()
+            
+            Button(action: onFavoriteTap) {
+                Image(systemName: isFavorite ? "heart.fill" : "heart")
+                    .foregroundColor(isFavorite ? .red : .gray)
+                    .scaleEffect(isFavorite ? 1.2 : 1.0)
+                    .animation(.spring(response: 0.3), value: isFavorite)
+            }
+            .buttonStyle(.plain)
         }
         .padding()
         .background(Color(.systemBackground))

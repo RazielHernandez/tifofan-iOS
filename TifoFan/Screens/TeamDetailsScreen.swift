@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 enum TeamTab: String, CaseIterable {
     case overview = "Overview"
     case players = "Players"
@@ -19,10 +17,15 @@ struct TeamDetailsScreen: View {
     let team: TeamSummary
     let leagueId: Int
     
+    @EnvironmentObject var favoritesVM: FavoritesViewModel
     @StateObject private var vm = TeamDetailsViewModel()
     @State private var selectedTab: TeamTab = .overview
     
     private let season = 2024
+    
+    private var isFavorite: Bool {
+        favoritesVM.favoriteTeamIds.contains(team.id)
+    }
     
     var body: some View {
         ScrollView {
@@ -42,6 +45,11 @@ struct TeamDetailsScreen: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle(team.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                favoriteButton
+            }
+        }
         .task {
             if vm.teamDetail == nil {
                 await vm.fetchTeamDetails(
@@ -50,6 +58,26 @@ struct TeamDetailsScreen: View {
                     season: season
                 )
             }
+            
+            if favoritesVM.favoriteTeamIds.isEmpty {
+                await favoritesVM.fetchFavorites()
+            }
+        }
+    }
+    
+    
+    private var favoriteButton: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            
+            Task {
+                await favoritesVM.toggleTeam(team)
+            }
+        } label: {
+            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                .foregroundColor(isFavorite ? .red : .gray)
+                .scaleEffect(isFavorite ? 1.2 : 1.0)
+                .animation(.spring(response: 0.3), value: isFavorite)
         }
     }
 }
@@ -72,6 +100,12 @@ extension TeamDetailsScreen {
             Text(team.name)
                 .font(.title2)
                 .fontWeight(.bold)
+            
+            if isFavorite {
+                Text("★ Favorite")
+                    .font(.caption)
+                    .foregroundColor(.red)
+            }
             
             Text("Season \(season)")
                 .font(.caption)

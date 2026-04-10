@@ -12,6 +12,8 @@ struct TeamsView: View {
     let league: League
     @ObservedObject var vm: LeagueViewModel
     
+    @EnvironmentObject var favoritesVM: FavoritesViewModel
+    
     private let season = 2024
     
     var body: some View {
@@ -19,26 +21,39 @@ struct TeamsView: View {
             if vm.isLoading {
                 VStack {
                     Spacer()
-                    
                     ProgressView()
-                    
                     Spacer()
                 }
+                
             } else if let error = vm.errorMessage {
                 ErrorScreen(errorMessage: error)
+                
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         
                         ForEach(vm.teams, id: \.id) { team in
                             
-                            NavigationLink {
-                                TeamDetailsScreen(
-                                    team: team,
-                                    leagueId: league.id
-                                )
-                            } label: {
-                                TeamRow(team: team)
+                            HStack {
+                                
+                                NavigationLink {
+                                    TeamDetailsScreen(
+                                        team: team,
+                                        leagueId: league.id
+                                    )
+                                } label: {
+                                    TeamRow(
+                                        team: team,
+                                        isFavorite: favoritesVM.favoriteTeamIds.contains(team.id),
+                                        onFavoriteTap: {
+                                            Task {
+                                                await favoritesVM.toggleTeam(team)
+                                            }
+                                        }
+                                    )
+                                }
+                                
+                                Spacer()
                             }
                         }
                     }
@@ -52,6 +67,11 @@ struct TeamsView: View {
                     league: league.id,
                     season: season
                 )
+            }
+            
+            // 🔥 Load favorites (important)
+            if favoritesVM.favoriteTeamIds.isEmpty {
+                await favoritesVM.fetchFavorites()
             }
         }
     }
