@@ -21,10 +21,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct TifoFanApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var favoritesVM = FavoritesViewModel()
     
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environmentObject(favoritesVM)
         }
     }
 }

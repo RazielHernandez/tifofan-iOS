@@ -8,9 +8,10 @@
 import SwiftUI
 
 enum MatchTab: String, CaseIterable {
-    case overview = "Overview"
+    // case overview = "Overview"
     case stats = "Stats"
     case lineups = "Lineups"
+    case mxm = "MxM"
 }
 
 struct MatchDetailScreen: View {
@@ -18,7 +19,7 @@ struct MatchDetailScreen: View {
     let matchId: Int
     
     @StateObject private var vm = MatchViewModel()
-    @State private var selectedTab: MatchTab = .overview
+    @State private var selectedTab: MatchTab = .stats
     
     var body: some View {
         VStack {
@@ -52,12 +53,14 @@ struct MatchDetailScreen: View {
                 // CONTENT
                 ScrollView {
                     switch selectedTab {
-                    case .overview:
-                        OverviewView(match: match)
+//                    case .overview:
+//                        OverviewView(match: match)
                     case .stats:
-                        StatsMatchView(stats: vm.statistics)
+                        StatsMatchView(stats: vm.statistics, match: match)
                     case .lineups:
                         LineupsView(matchId: matchId)
+                    case .mxm:
+                        Text("Minute per minute plays are coming soon!")
                     }
                 }
             }
@@ -167,15 +170,42 @@ struct OverviewView: View {
 struct StatsMatchView: View {
     
     let stats: [TeamMatchStatistics]
+    let match: MatchDetail
     
     var body: some View {
         VStack(spacing: 12) {
             
-            ForEach(statItems(), id: \.title) { item in
-                StatBarRow(
-                    item: item,
-                )
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Date")
+                    Spacer()
+                    Text(match.date, style: .date)
+                }
+                
+                HStack {
+                    Text("Venue")
+                    Spacer()
+                    Text(match.venue ?? "N/A")
+                }
             }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(radius: 2)
+            
+            
+            VStack(spacing:12) {
+                ForEach(statItems(), id: \.title) { item in
+                    StatBarRow(
+                        item: item,
+                    )
+                }
+            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(radius: 2)
+            
         }
         .padding()
     }

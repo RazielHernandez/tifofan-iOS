@@ -204,3 +204,59 @@ extension FirebaseService {
     }
 }
 
+extension FirebaseService {
+    
+    // MARK: - Favorites
+    
+    func getFavorites() async throws -> FavoritesResponse {
+        try await callFunction(
+            name: "v1-getFavorites",
+            responseType: FavoritesResponse.self
+        )
+    }
+    
+    func addFavorite(
+        type: String,
+        item: Encodable
+    ) async throws -> APIResponse<SuccessResponse> {
+        
+        try await callFunction(
+            name: "v1-addFavorite",
+            data: [
+                "type": type,
+                "item": item.toDictionary()
+            ],
+            responseType: APIResponse<SuccessResponse>.self
+        )
+    }
+    
+    func removeFavorite(
+        type: String,
+        id: Int
+    ) async throws -> APIResponse<SuccessResponse> {
+        
+        try await callFunction(
+            name: "v1-removeFavorite",
+            data: [
+                "type": type,
+                "id": id
+            ],
+            responseType: APIResponse<SuccessResponse>.self
+        )
+    }
+    
+    func saveFavorites(
+        leagues: [League],
+        teams: [TeamSummary]
+    ) async throws -> APIResponse<SuccessResponse> {
+        
+        try await callFunction(
+            name: "saveFavorites",
+            data: [
+                "leagues": leagues.map { $0.toDictionary() },
+                "teams": teams.map { $0.toDictionary() }
+            ],
+            responseType: APIResponse<SuccessResponse>.self
+        )
+    }
+}

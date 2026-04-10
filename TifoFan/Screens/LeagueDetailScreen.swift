@@ -74,7 +74,7 @@ struct LeagueDetailView: View {
                 Spacer()
             }
         }
-        .navigationTitle(league.name)
+        .navigationTitle(league.name + "(" + league.country + ")")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -88,7 +88,7 @@ struct FixturesView: View {
     private let season = 2024
     
     var body: some View {
-        Group {
+        VStack {
             if vm.isLoading {
                 VStack {
                     Spacer()

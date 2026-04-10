@@ -48,6 +48,9 @@ typealias PlayerResponse = APIResponse<PlayerData>
 
 typealias SupportedLeaguesResponse = APIResponse<[League]>
 
+// MARK: - Favourites
+typealias FavoritesResponse = APIResponse<FavoritesData>
+
 struct FlexibleDouble: Codable {
     let value: Double?
 
