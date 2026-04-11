@@ -10,7 +10,7 @@ import SwiftUI
 struct TeamRow: View {
     
     let team: TeamSummary
-    let isFavorite: Bool
+    @Binding var isFavorite: Bool
     let onFavoriteTap: () -> Void
     
     var body: some View {
@@ -37,7 +37,11 @@ struct TeamRow: View {
             .buttonStyle(.plain)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(
+            isFavorite
+            ? Color.red.opacity(0.05)
+            : Color(.systemBackground)
+        )
         .cornerRadius(12)
         .shadow(radius: 2)
     }
