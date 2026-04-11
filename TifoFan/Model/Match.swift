@@ -17,9 +17,18 @@ struct Match: Codable, Identifiable {
     let status: String
     let home: MatchSide
     let away: MatchSide
+    
+    var displayStatus: String {
+        switch status {
+        case "FT": return "Finished"
+        case "NS": return "Upcoming"
+        case "PEN": return "Penalties"
+        default: return status
+        }
+    }
 }
 
 struct MatchSide: Codable {
     let team: TeamSummary
-    let goals: Int
+    let goals: Int?
 }

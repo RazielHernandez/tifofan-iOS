@@ -6,7 +6,15 @@
 //
 
 import Foundation
+import SwiftUI
 internal import Combine
+
+enum MatchFilter {
+    case league
+    case team
+    case date
+    case round
+}
 
 @MainActor
 final class MatchViewModel: ObservableObject {
@@ -14,6 +22,7 @@ final class MatchViewModel: ObservableObject {
     @Published var matches: [Match] = []
     @Published var selectedMatch: MatchDetail?
     @Published var statistics: [TeamMatchStatistics] = []
+    @Published var currentFilter: MatchFilter = .league
     
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -32,16 +41,13 @@ final class MatchViewModel: ObservableObject {
                 page: page
             )
             
-            matches = response.data
-        } catch {
-            errorMessage = error.localizedDescription
-            print("🔥 FULL ERROR:", error)
-            
-            if let nsError = error as NSError? {
-                print("🔥 Code:", nsError.code)
-                print("🔥 Domain:", nsError.domain)
-                print("🔥 UserInfo:", nsError.userInfo)
+            withAnimation(.easeInOut) {
+                matches = response.data
             }
+            
+            currentFilter = .league
+        } catch {
+            handleError(error)
         }
         
         isLoading = false
@@ -57,14 +63,7 @@ final class MatchViewModel: ObservableObject {
             selectedMatch = response.data
             
         } catch {
-            errorMessage = error.localizedDescription
-            print("🔥 FULL ERROR:", error)
-            
-            if let nsError = error as NSError? {
-                print("🔥 Code:", nsError.code)
-                print("🔥 Domain:", nsError.domain)
-                print("🔥 UserInfo:", nsError.userInfo)
-            }
+            handleError(error)
         }
         
         isLoading = false
@@ -81,16 +80,94 @@ final class MatchViewModel: ObservableObject {
             statistics = response.data
             
         } catch {
-            errorMessage = error.localizedDescription
-            print("🔥 FULL ERROR:", error)
-            
-            if let nsError = error as NSError? {
-                print("🔥 Code:", nsError.code)
-                print("🔥 Domain:", nsError.domain)
-                print("🔥 UserInfo:", nsError.userInfo)
-            }
+            handleError(error)
         }
         
         isLoading = false
+    }
+    
+    func fetchMatchesByTeam(
+        teamId: Int,
+        season: Int
+    ) async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let response = try await service.getMatchesByTeam(
+                teamId: teamId,
+                season: season
+            )
+            
+            withAnimation(.easeInOut) {
+                matches = response.data.sorted { $0.date < $1.date }
+            }
+            
+            currentFilter = .team
+        } catch {
+            handleError(error)
+        }
+        
+        isLoading = false
+    }
+    
+    func fetchMatchesByDate(
+        date: Date
+    ) async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let response = try await service.getMatchesByDate(date: date)
+            
+            withAnimation(.easeInOut) {
+                matches = response.data.sorted { $0.date < $1.date }
+            }
+            
+            currentFilter = .date
+        } catch {
+            handleError(error)
+        }
+        
+        isLoading = false
+    }
+    
+    func fetchMatchesByRound(
+        leagueId: Int,
+        season: Int,
+        round: String
+    ) async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let response = try await service.getMatchesByRound(
+                leagueId: leagueId,
+                season: season,
+                round: round
+            )
+            
+            withAnimation(.easeInOut) {
+                matches = response.data.sorted { $0.date < $1.date }
+            }
+            
+            currentFilter = .round
+        } catch {
+            handleError(error)
+        }
+        
+        isLoading = false
+    }
+    
+    private func handleError(_ error: Error) {
+        errorMessage = error.localizedDescription
+        
+        print("🔥 FULL ERROR:", error)
+        
+        if let nsError = error as NSError? {
+            print("🔥 Code:", nsError.code)
+            print("🔥 Domain:", nsError.domain)
+            print("🔥 UserInfo:", nsError.userInfo)
+        }
     }
 }

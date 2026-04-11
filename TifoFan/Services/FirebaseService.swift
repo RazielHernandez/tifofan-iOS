@@ -202,6 +202,56 @@ extension FirebaseService {
             responseType: MatchLineupResponse.self
         )
     }
+    
+    func getMatchesByTeam(
+        teamId: Int,
+        season: Int
+    ) async throws -> MatchesResponse {
+        try await callFunction(
+            name: "v1-getMatchesByTeamCallable",
+            data: [
+                "team": teamId,
+                "season": season
+            ],
+            responseType: MatchesResponse.self
+        )
+    }
+    
+    func getMatchesByRound(
+        leagueId: Int,
+        season: Int,
+        round: String
+    ) async throws -> MatchesResponse {
+        
+        try await callFunction(
+            name: "v1-getMatchesByRoundCallable",
+            data: [
+                "league": leagueId,
+                "season": season,
+                "round": round
+            ],
+            responseType: MatchesResponse.self
+        )
+    }
+    
+    func getMatchesByDate(
+        date: Date
+    ) async throws -> MatchesResponse {
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        let dateString = formatter.string(from: date)
+        
+        return try await callFunction(
+            name: "v1-getMatchesByDateCallable",
+            data: [
+                "date": dateString
+            ],
+            responseType: MatchesResponse.self
+        )
+    }
 }
 
 extension FirebaseService {
@@ -251,7 +301,7 @@ extension FirebaseService {
     ) async throws -> APIResponse<SuccessResponse> {
         
         try await callFunction(
-            name: "saveFavorites",
+            name: "v1-saveFavorites",
             data: [
                 "leagues": leagues.map { $0.toDictionary() },
                 "teams": teams.map { $0.toDictionary() }

@@ -14,7 +14,7 @@ struct MatchRow: View {
     var body: some View {
         VStack(spacing: 10) {
             
-            // 📅 DATE (TOP)
+            // 📅 DATE
             HStack {
                 Text(formattedDate(match.date))
                     .font(.caption)
@@ -22,15 +22,13 @@ struct MatchRow: View {
                 
                 Spacer()
                 
-                Text(match.status ?? "")
+                Text(match.displayStatus)
                     .font(.caption2)
                     .foregroundColor(.gray)
             }
             
-            // 🏟️ TEAMS
+            // 🏟️ HOME
             HStack {
-                
-                // HOME TEAM
                 HStack(spacing: 8) {
                     AsyncImage(url: match.home.team.logo) { image in
                         image.resizable()
@@ -46,13 +44,17 @@ struct MatchRow: View {
                 
                 Spacer()
                 
-                Text("\(match.home.goals)")
-                    .fontWeight(isWinner(home: true) ? .bold : .regular)
+                if let goals = match.home.goals {
+                    Text("\(goals)")
+                        .fontWeight(isWinner(home: true) ? .bold : .regular)
+                } else {
+                    Text("-")
+                        .foregroundColor(.secondary)
+                }
             }
             
+            // 🏟️ AWAY
             HStack {
-                
-                // AWAY TEAM
                 HStack(spacing: 8) {
                     AsyncImage(url: match.away.team.logo) { image in
                         image.resizable()
@@ -68,8 +70,13 @@ struct MatchRow: View {
                 
                 Spacer()
                 
-                Text("\(match.away.goals)")
-                    .fontWeight(isWinner(home: false) ? .bold : .regular)
+                if let goals = match.away.goals {
+                    Text("\(goals)")
+                        .fontWeight(isWinner(home: false) ? .bold : .regular)
+                } else {
+                    Text("-")
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .padding()
@@ -79,11 +86,16 @@ struct MatchRow: View {
     }
     
     private func isWinner(home: Bool) -> Bool {
-        if home {
-            return match.home.goals > match.away.goals
-        } else {
-            return match.away.goals > match.home.goals
+        guard
+            let homeGoals = match.home.goals,
+            let awayGoals = match.away.goals
+        else {
+            return false
         }
+        
+        return home
+            ? homeGoals > awayGoals
+            : awayGoals > homeGoals
     }
 }
 

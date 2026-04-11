@@ -10,6 +10,7 @@ import SwiftUI
 enum TeamTab: String, CaseIterable {
     case overview = "Overview"
     case players = "Players"
+    case matches = "Matches"
 }
 
 struct TeamDetailsScreen: View {
@@ -19,12 +20,38 @@ struct TeamDetailsScreen: View {
     
     @EnvironmentObject var favoritesVM: FavoritesViewModel
     @StateObject private var vm = TeamDetailsViewModel()
+    @StateObject private var matchVM = MatchViewModel()
     @State private var selectedTab: TeamTab = .overview
     
-    private let season = 2024
+    
+    private let season = 2025
     
     private var isFavorite: Bool {
         favoritesVM.favoriteTeamIds.contains(team.id)
+    }
+    
+    private var sortedMatches: [Match] {
+        matchVM.matches.sorted { $0.date < $1.date }
+    }
+
+    private var now: Date {
+        Date()
+    }
+
+    // ⏮ Finished matches
+    private var previousMatches: [Match] {
+        sortedMatches.filter { $0.date < now }
+    }
+
+    // ⭐ Next match (first upcoming)
+    private var nextMatch: Match? {
+        sortedMatches.first { $0.date >= now }
+    }
+
+    // ⏭ Future matches (excluding next)
+    private var futureMatches: [Match] {
+        guard let next = nextMatch else { return [] }
+        return sortedMatches.filter { $0.date > next.date }
     }
     
     var body: some View {
@@ -61,6 +88,13 @@ struct TeamDetailsScreen: View {
             
             if favoritesVM.favoriteTeamIds.isEmpty {
                 await favoritesVM.fetchFavorites()
+            }
+            
+            if matchVM.matches.isEmpty {
+                await matchVM.fetchMatchesByTeam(
+                    teamId: team.id,
+                    season: season
+                )
             }
         }
     }
@@ -152,18 +186,183 @@ extension TeamDetailsScreen {
             
             switch selectedTab {
                 
-            case .overview:
-                overviewView(details: details)
+                case .overview:
+                    overviewView(details: details)
+                    
+                case .players:
+                    TeamPlayersListView(
+                        teamId: team.id,
+                        leagueId: leagueId
+                    )
+                case .matches:
+                    matchesView
                 
-            case .players:
-                TeamPlayersListView(
-                    teamId: team.id,
-                    leagueId: leagueId
-                )
+            }
+            
+        
+        }
+    }
+    
+    private var matchesView: some View {
+        VStack(spacing: 16) {
+            
+            if matchVM.isLoading {
+                ProgressView()
+                    .padding()
+            }
+            else if let error = matchVM.errorMessage {
+                ErrorScreen(errorMessage: error)
+            }
+            else if matchVM.matches.isEmpty {
+                Text("No matches available")
+                    .foregroundColor(.secondary)
+                    .padding()
+            }
+            else {
+                
+                LazyVStack(spacing: 16) {
+                    
+                    // ⏮ PREVIOUS MATCHES
+                    if !previousMatches.isEmpty {
+                        sectionHeader("Previous Matches")
+                        
+                        ForEach(previousMatches.reversed()) { match in
+                            matchRow(match)
+                        }
+                    }
+                    
+                    // ⭐ NEXT MATCH (HIGHLIGHTED)
+                    if let next = nextMatch {
+                        sectionHeader("Next Match")
+                        
+                        matchRow(next, highlight: true)
+                    }
+                    
+                    // ⏭ FUTURE MATCHES
+                    if !futureMatches.isEmpty {
+                        sectionHeader("Upcoming Matches")
+                        
+                        ForEach(futureMatches) { match in
+                            matchRow(match)
+                        }
+                    }
+                }
             }
         }
     }
+    
+    private func matchRow(_ match: Match, highlight: Bool = false) -> some View {
+        NavigationLink {
+            MatchDetailScreen(matchId: match.id)
+        } label: {
+            TeamMatchRow(
+                match: match,
+                teamId: team.id
+            )
+            .scaleEffect(highlight ? 1.02 : 1)
+            .background(
+                highlight
+                ? Color.blue.opacity(0.08)
+                : Color.clear
+            )
+            .cornerRadius(12)
+        }
+    }
+    
+    private func sectionHeader(_ title: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+    
+    struct TeamMatchRow: View {
+        
+        let match: Match
+        let teamId: Int
+        
+        private var isHome: Bool {
+            match.home.team.id == teamId
+        }
+        
+//        private var isWinner: Bool {
+//            let teamGoals = isHome ? match.home.goals : match.away.goals
+//            let opponentGoals = isHome ? match.away.goals : match.home.goals
+//            return teamGoals > opponentGoals
+//        }
+        
+        private var isWinner: Bool {
+            guard
+                let teamGoals = isHome ? match.home.goals : match.away.goals,
+                let opponentGoals = isHome ? match.away.goals : match.home.goals
+            else {
+                return false // not played yet
+            }
+            
+            return teamGoals > opponentGoals
+        }
+        
+        
+        
+        var body: some View {
+            HStack(spacing: 12) {
+                
+                // TEAM LOGO
+                AsyncImage(url: isHome ? match.home.team.logo : match.away.team.logo) { image in
+                    image.resizable()
+                } placeholder: {
+                    Color.gray.opacity(0.2)
+                }
+                .frame(width: 30, height: 30)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    
+                    Text(isHome ? "vs \(match.away.team.name)" : "@ \(match.home.team.name)")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    Text(match.date, style: .date)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    if let homeGoals = match.home.goals,
+                       let awayGoals = match.away.goals {
+                        
+                        Text("\(homeGoals) - \(awayGoals)")
+                            .fontWeight(.bold)
+                        
+                    } else {
+                        Text("vs")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Text(match.displayStatus)
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding()
+            .background(
+                isWinner
+                ? Color.green.opacity(0.08)
+                : Color(.systemBackground)
+            )
+            .cornerRadius(12)
+            .shadow(radius: 2)
+        }
+    }
+    
+    
 }
+
+
 
 extension TeamDetailsScreen {
     

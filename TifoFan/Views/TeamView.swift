@@ -38,34 +38,6 @@ struct TeamsView: View {
                 
             } else {
                 ScrollView {
-//                    LazyVStack(spacing: 12) {
-//                        
-//                        ForEach(vm.teams, id: \.id) { team in
-//                            
-//                            HStack {
-//                                
-//                                NavigationLink {
-//                                    TeamDetailsScreen(
-//                                        team: team,
-//                                        leagueId: league.id
-//                                    )
-//                                } label: {
-//                                    TeamRow(
-//                                        team: team,
-//                                        isFavorite: favoritesVM.favoriteTeamIds.contains(team.id),
-//                                        onFavoriteTap: {
-//                                            Task {
-//                                                await favoritesVM.toggleTeam(team)
-//                                            }
-//                                        }
-//                                    )
-//                                }
-//                                
-//                                Spacer()
-//                            }
-//                        }
-//                    }
-//                    .padding()
                     LazyVStack(spacing: 16) {
                         
                         // ⭐ FAVORITES SECTION
