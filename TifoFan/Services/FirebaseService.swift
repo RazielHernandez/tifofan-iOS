@@ -136,6 +136,21 @@ extension FirebaseService {
             responseType: APIResponse<[StandingsRow]>.self
         )
     }
+    
+    func getLeagueStats(
+        league: Int,
+        season: Int
+    ) async throws -> LeagueStatsResponse {
+        
+        try await callFunction(
+            name: "v1-getLeagueStatsCallable",
+            data: [
+                "league": league,
+                "season": season
+            ],
+            responseType: LeagueStatsResponse.self
+        )
+    }
 }
 
 extension FirebaseService {

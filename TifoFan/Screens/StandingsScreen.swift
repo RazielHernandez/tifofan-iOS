@@ -11,6 +11,7 @@ enum StandingMode: String, CaseIterable {
     case all = "All"
     case home = "Home"
     case away = "Away"
+    case stats = "Stats"
 }
 
 struct StandingsScreen: View {
@@ -55,17 +56,41 @@ struct StandingsScreen: View {
                 ErrorScreen(errorMessage: error)
             } else {
                 
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        
-                        StandingsHeader()
-                        
-                        ForEach(vm.standings) { row in
-                            StandingsRowView(row: row, mode: mode, leagueId: leagueId)
-                            Divider()
+//                ScrollView {
+//                    LazyVStack(spacing: 8) {
+//                        
+//                        StandingsHeader()
+//                        
+//                        ForEach(vm.standings) { row in
+//                            StandingsRowView(row: row, mode: mode, leagueId: leagueId)
+//                            Divider()
+//                        }
+//                    }
+//                    .padding(.horizontal)
+//                }
+                
+                if mode == .stats {
+                    LeagueStatsView(
+                        leagueId: leagueId,
+                        season: season
+                    )
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 8) {
+                            
+                            StandingsHeader()
+                            
+                            ForEach(vm.standings) { row in
+                                StandingsRowView(
+                                    row: row,
+                                    mode: mode,
+                                    leagueId: leagueId
+                                )
+                                Divider()
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
             }
         }
@@ -73,6 +98,161 @@ struct StandingsScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await vm.fetchStandings(league: leagueId, season: season)
+        }
+    }
+}
+
+struct LeagueStatsView: View {
+    
+    let leagueId: Int
+    let season: Int
+    
+    @StateObject private var vm = LeagueStatsViewModel()
+    
+    var body: some View {
+        ScrollView {
+            if vm.isLoading {
+                ProgressView()
+                    .padding()
+                
+            } else if let stats = vm.stats {
+                
+                VStack(spacing: 20) {
+                    
+                    playerSection(
+                        title: "Top Scorers",
+                        players: stats.topScorers,
+                        statValue: { $0.statistics.goals },
+                        badge: "⚽"
+                    )
+
+                    playerSection(
+                        title: "Top Assists",
+                        players: stats.topAssists,
+                        statValue: { $0.statistics.assists },
+                        badge: "🅰️"
+                    )
+
+                    playerSection(
+                        title: "Most Cards",
+                        players: stats.topCards,
+                        statValue: { $0.statistics.yellow + $0.statistics.red },
+                        badge: "🟨"
+                    )
+                    
+                    teamSection(stats.teams)
+                }
+                .padding()
+            }
+        }
+        .task {
+            if vm.stats == nil {
+                await vm.fetchStats(
+                    league: leagueId,
+                    season: season
+                )
+            }
+        }
+    }
+    
+    private func statRow(
+        title: String,
+        team: String,
+        value: Int
+    ) -> some View {
+        
+        HStack {
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Text(team)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+            }
+            
+            Spacer()
+            
+            Text("\(value)")
+                .font(.headline)
+                .fontWeight(.bold)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 2)
+    }
+    
+    private func playerSection(
+        title: String,
+        players: [PlayerStat],
+        statValue: @escaping (PlayerStat) -> Int,
+        badge: String
+    ) -> some View {
+        
+        VStack(alignment: .leading, spacing: 10) {
+            
+            Text(title)
+                .font(.headline)
+            
+            ForEach(players.prefix(5)) { player in
+                HStack {
+                    
+                    AsyncImage(url: player.player.photo) { image in
+                        image.resizable()
+                    } placeholder: {
+                        Color.gray.opacity(0.2)
+                    }
+                    .frame(width: 32, height: 32)
+                    .clipShape(Circle())
+                    
+                    VStack(alignment: .leading) {
+                        Text(player.player.name)
+                            .font(.subheadline)
+                        
+                        Text(player.team.name)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 6) {
+                        
+                        Text(badge)
+                        
+                        Text("\(statValue(player))")
+                            .fontWeight(.bold)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+        }
+    }
+    
+    private func teamSection(_ teams: TeamStats) -> some View {
+        
+        VStack(alignment: .leading, spacing: 12) {
+            
+            Text("Team Stats")
+                .font(.headline)
+            
+            statRow(
+                title: "Best Attack",
+                team: teams.bestAttack.name,
+                value: teams.bestAttack.goals ?? 0
+            )
+            
+            statRow(
+                title: "Best Defense",
+                team: teams.bestDefense.name,
+                value: teams.bestDefense.goalsAgainst ?? 0
+            )
         }
     }
 }
@@ -121,6 +301,15 @@ struct StandingsRowView: View {
                 win: row.away.win,
                 draw: row.away.draw,
                 lose: row.away.lose,
+                goalsFor: 0,
+                goalsAgainst: 0
+            )
+        case .stats:
+            return Stats(
+                played: 0,
+                win: 0,
+                draw: 0,
+                lose: 0,
                 goalsFor: 0,
                 goalsAgainst: 0
             )
@@ -185,14 +374,6 @@ struct StandingsRowView: View {
             // FORM (only in ALL)
             if let form = row.form, mode == .all {
                 HStack(spacing: 4) {
-//                    ForEach(Array(form), id: \.self) { char in
-//                        Text(String(char))
-//                            .font(.caption2)
-//                            .frame(width: 18, height: 18)
-//                            .background(color(for: char))
-//                            .foregroundColor(.white)
-//                            .clipShape(Circle())
-//                    }
                     ForEach(Array(form.enumerated()), id: \.offset) { index, char in
                         Text(String(char))
                             .font(.caption2)

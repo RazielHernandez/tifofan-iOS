@@ -47,6 +47,7 @@ typealias PlayerResponse = APIResponse<PlayerData>
 // MARK: - Leagues
 
 typealias SupportedLeaguesResponse = APIResponse<[League]>
+typealias LeagueStatsResponse = APIResponse<LeagueStats>
 
 // MARK: - Favourites
 typealias FavoritesResponse = APIResponse<FavoritesData>
