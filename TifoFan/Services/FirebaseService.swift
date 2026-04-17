@@ -267,6 +267,18 @@ extension FirebaseService {
             responseType: MatchesResponse.self
         )
     }
+    
+    func getMatchEvents(
+        matchId: Int
+    ) async throws -> MatchEventsResponse {
+        try await callFunction(
+            name: "v1-getMatchEventsCallable",
+            data: [
+                "fixture": matchId
+            ],
+            responseType: MatchEventsResponse.self
+        )
+    }
 }
 
 extension FirebaseService {

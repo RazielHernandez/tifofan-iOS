@@ -198,55 +198,55 @@ extension TeamDetailsScreen {
                     matchesView
                 
             }
-            
         
         }
     }
     
     private var matchesView: some View {
-        VStack(spacing: 16) {
-            
-            if matchVM.isLoading {
-                ProgressView()
-                    .padding()
-            }
-            else if let error = matchVM.errorMessage {
-                ErrorScreen(errorMessage: error)
-            }
-            else if matchVM.matches.isEmpty {
-                Text("No matches available")
-                    .foregroundColor(.secondary)
-                    .padding()
-            }
-            else {
-                
-                LazyVStack(spacing: 16) {
+        
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: 24) {
                     
-                    // ⏮ PREVIOUS MATCHES
-                    if !previousMatches.isEmpty {
-                        sectionHeader("Previous Matches")
+                    ForEach(sortedMatches) { match in
                         
-                        ForEach(previousMatches.reversed()) { match in
-                            matchRow(match)
+                        if match.id == nextMatch?.id {
+                            Text("TODAY")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(.blue)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
                         }
-                    }
-                    
-                    // ⭐ NEXT MATCH (HIGHLIGHTED)
-                    if let next = nextMatch {
-                        sectionHeader("Next Match")
                         
-                        matchRow(next, highlight: true)
-                    }
-                    
-                    // ⏭ FUTURE MATCHES
-                    if !futureMatches.isEmpty {
-                        sectionHeader("Upcoming Matches")
-                        
-                        ForEach(futureMatches) { match in
-                            matchRow(match)
-                        }
+                        TimelineMatchRow(
+                            match: match,
+                            teamId: team.id,
+                            isNext: match.id == nextMatch?.id
+                        )
+                        .id(match.id)
                     }
                 }
+                .padding(.vertical)
+                .onAppear {
+                    scrollToRelevantMatch(proxy: proxy)
+                }
+                .onChange(of: matchVM.matches) {
+                    scrollToRelevantMatch(proxy: proxy)
+                }
+            }
+        }
+    }
+    
+    private func scrollToRelevantMatch(proxy: ScrollViewProxy) {
+        
+        guard !sortedMatches.isEmpty else { return }
+        
+        DispatchQueue.main.async {
+            if let next = nextMatch {
+                proxy.scrollTo(next.id, anchor: .center)
+            } else if let last = sortedMatches.last {
+                proxy.scrollTo(last.id, anchor: .bottom)
             }
         }
     }
@@ -286,12 +286,6 @@ extension TeamDetailsScreen {
         private var isHome: Bool {
             match.home.team.id == teamId
         }
-        
-//        private var isWinner: Bool {
-//            let teamGoals = isHome ? match.home.goals : match.away.goals
-//            let opponentGoals = isHome ? match.away.goals : match.home.goals
-//            return teamGoals > opponentGoals
-//        }
         
         private var isWinner: Bool {
             guard
@@ -388,7 +382,6 @@ extension TeamDetailsScreen {
                 
                 statRow("Points", "\(details.aggregates.points)", bold: true)
             }
-            //.cardStyle()
             
             // ADVANCED STATS
             VStack(spacing: 12) {
@@ -397,7 +390,6 @@ extension TeamDetailsScreen {
                 statRow("Conceded / Match", details.aggregates.goalsAgainstPerMatch.formatted(2))
                 
             }
-            //.cardStyle()
         }
     }
     

@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Match
 
-struct Match: Codable, Identifiable {
+struct Match: Codable, Identifiable, Equatable {
     let id: Int
     let leagueId: Int
     let season: Int
@@ -17,6 +17,10 @@ struct Match: Codable, Identifiable {
     let status: String
     let home: MatchSide
     let away: MatchSide
+    
+    static func == (lhs: Match, rhs: Match) -> Bool {
+        return lhs.id == rhs.id
+    }
     
     var displayStatus: String {
         switch status {

@@ -8,7 +8,6 @@
 import SwiftUI
 
 enum MatchTab: String, CaseIterable {
-    // case overview = "Overview"
     case stats = "Stats"
     case lineups = "Lineups"
     case mxm = "MxM"
@@ -53,14 +52,12 @@ struct MatchDetailScreen: View {
                 // CONTENT
                 ScrollView {
                     switch selectedTab {
-//                    case .overview:
-//                        OverviewView(match: match)
                     case .stats:
                         StatsMatchView(stats: vm.statistics, match: match)
                     case .lineups:
                         LineupsView(matchId: matchId)
                     case .mxm:
-                        Text("Minute per minute plays are coming soon!")
+                        MatchEventsScreen(matchId: matchId)
                     }
                 }
             }
@@ -124,13 +121,21 @@ struct ScoreBlock: View {
     
     var body: some View {
         VStack {
-            Text("\(match.home.goals) - \(match.away.goals)")
+            Text("\(goals(match.home.goals)) - \(goals(match.away.goals))")
                 .font(.title)
                 .bold()
             
             Text(match.date, style: .time)
                 .font(.caption)
                 .foregroundColor(.gray)
+        }
+    }
+    
+    private func goals(_ value: Int?) -> String {
+        if let value = value {
+            return "\(value)"
+        } else {
+            return "-"
         }
     }
 }
