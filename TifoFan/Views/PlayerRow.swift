@@ -14,7 +14,6 @@ struct PlayerRow: View {
     var body: some View {
         HStack(spacing: 12) {
             
-            // 🖼 Player photo
             AsyncImage(url: player.photo) { image in
                 image.resizable()
             } placeholder: {
@@ -35,13 +34,6 @@ struct PlayerRow: View {
             }
             
             Spacer()
-            
-            // 🎯 Optional quick stat
-//            if let number = player.number {
-//                Text("#\(number)")
-//                    .font(.caption)
-//                    .foregroundColor(.gray)
-//            }
         }
         .padding(.vertical, 6)
     }

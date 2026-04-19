@@ -31,13 +31,6 @@ struct LeagueDetailView: View {
                     Color.gray.opacity(0.2)
                 }
                 .frame(width: 80, height: 80)
-                
-//                Text(league.name)
-//                    .font(.title2)
-//                    .bold()
-//                
-//                Text(league.country)
-//                    .foregroundColor(.gray)
             }
             .padding()
             

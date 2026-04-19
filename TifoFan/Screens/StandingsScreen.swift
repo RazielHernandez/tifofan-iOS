@@ -56,19 +56,6 @@ struct StandingsScreen: View {
                 ErrorScreen(errorMessage: error)
             } else {
                 
-//                ScrollView {
-//                    LazyVStack(spacing: 8) {
-//                        
-//                        StandingsHeader()
-//                        
-//                        ForEach(vm.standings) { row in
-//                            StandingsRowView(row: row, mode: mode, leagueId: leagueId)
-//                            Divider()
-//                        }
-//                    }
-//                    .padding(.horizontal)
-//                }
-                
                 if mode == .stats {
                     LeagueStatsView(
                         leagueId: leagueId,
@@ -318,7 +305,6 @@ struct StandingsRowView: View {
     
     var body: some View {
         NavigationLink {
-            // TeamDetailScreen(teamId: row.team.id, leagueId: leagueId, season: 2023)
             TeamDetailsScreen(team: row.team, leagueId: leagueId)
         } label: {
             content

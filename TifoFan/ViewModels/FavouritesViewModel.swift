@@ -45,7 +45,6 @@ final class FavoritesViewModel: ObservableObject {
     
     func addFavoriteLeague(_ league: League) async {
             
-        // Optimistic update
         favoriteLeagueIds.insert(league.id)
         
         do {
@@ -56,7 +55,6 @@ final class FavoritesViewModel: ObservableObject {
         } catch {
             print("❌ Add league failed:", error)
             
-            // Rollback if failed
             favoriteLeagueIds.remove(league.id)
         }
     }
@@ -80,7 +78,6 @@ final class FavoritesViewModel: ObservableObject {
     
     func removeFavoriteLeague(_ leagueId: Int) async {
         
-        // Optimistic update
         favoriteLeagueIds.remove(leagueId)
         
         do {
@@ -91,7 +88,6 @@ final class FavoritesViewModel: ObservableObject {
         } catch {
             print("❌ Remove league failed:", error)
             
-            // Rollback
             favoriteLeagueIds.insert(leagueId)
         }
     }

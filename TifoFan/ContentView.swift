@@ -21,10 +21,6 @@ struct ContentView: View {
             }
             
             Tab("Statistics", systemImage: "chart.bar") {
-                StatisticsScreen()
-            }
-            
-            Tab("Leagues", systemImage: "soccerball") {
                 LeaguesScreen()
             }
             

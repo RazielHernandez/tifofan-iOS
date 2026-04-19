@@ -54,20 +54,6 @@ final class MatchViewModel: ObservableObject {
     }
     
     // MARK: - Fetch Match Detail
-//    func fetchMatchDetail(matchId: Int) async {
-//        isLoading = true
-//        errorMessage = nil
-//        
-//        do {
-//            let response = try await service.getMatchDetail(matchId: matchId)
-//            selectedMatch = response.data
-//            
-//        } catch {
-//            handleError(error)
-//        }
-//        
-//        isLoading = false
-//    }
     func fetchMatchDetail(matchId: Int) async {
         isLoading = true
         errorMessage = nil

@@ -99,7 +99,3 @@ struct LeaguesScreen: View {
         }
     }
 }
-
-//#Preview {
-//    LeaguesScreen()
-//}

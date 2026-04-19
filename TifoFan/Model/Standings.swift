@@ -7,18 +7,6 @@
 
 import Foundation
 
-//struct StandingsRow: Codable, Identifiable {
-//    
-//    let rank: Int
-//    let team: TeamSummary
-//    let points: Int
-//    let goalsDiff: Int
-//    let form: String?
-//    let all: Stats
-//    
-//    var id: Int {team.id}
-//}
-
 struct StandingsRow: Codable, Identifiable {
     
     let rank: Int

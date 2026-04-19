@@ -5,11 +5,6 @@
 //  Created by Puma Azteca on 2026-02-26.
 //
 
-//
-//  Team.swift
-//  TifoFan
-//
-
 import Foundation
 
 struct TeamSummary: Codable, Identifiable {

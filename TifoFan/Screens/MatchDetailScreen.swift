@@ -313,44 +313,6 @@ struct StatsMatchView: View {
     let stats: [TeamMatchStatistics]
     let match: MatchDetail
     
-//    var body: some View {
-//        VStack(spacing: 12) {
-//            
-//            VStack(spacing: 12) {
-//                HStack {
-//                    Text("Date")
-//                    Spacer()
-//                    Text(match.date, style: .date)
-//                }
-//                
-//                HStack {
-//                    Text("Venue")
-//                    Spacer()
-//                    Text(match.venue ?? "N/A")
-//                }
-//            }
-//            .padding()
-//            .background(Color(.systemBackground))
-//            .cornerRadius(12)
-//            .shadow(radius: 2)
-//            
-//            
-//            VStack(spacing:12) {
-//                ForEach(statItems(), id: \.title) { item in
-//                    StatBarRow(
-//                        item: item,
-//                    )
-//                }
-//            }
-//            .padding()
-//            .background(Color(.systemBackground))
-//            .cornerRadius(12)
-//            .shadow(radius: 2)
-//            
-//        }
-//        .padding()
-//    }
-    
     var body: some View {
         VStack(spacing: 12) {
             
@@ -364,25 +326,6 @@ struct StatsMatchView: View {
                     title: "No stats yet",
                     subtitle: "Statistics will appear once the match starts."
                 )
-                
-//                VStack(spacing: 14) {
-//                    
-//                    Image(systemName: "chart.bar.xaxis")
-//                        .font(.largeTitle)
-//                        .foregroundColor(.gray)
-//                    
-//                    Text(match.status == "NS"
-//                         ? "Match hasn't started"
-//                         : "No statistics available")
-//                        .font(.headline)
-//                    
-//                    Text(match.status == "NS"
-//                         ? "Stats will appear once the game kicks off."
-//                         : "Statistics are not available for this match.")
-//                        .font(.caption)
-//                        .foregroundColor(.secondary)
-//                }
-//                .padding()
                 
             } else {
                 
@@ -630,20 +573,6 @@ struct LineupsView: View {
                     title: "Lineups not available",
                     subtitle: "Teams will be announced before kickoff."
                 )
-                
-//                VStack(spacing: 14) {
-//                    Image(systemName: "person.3")
-//                        .font(.largeTitle)
-//                        .foregroundColor(.gray)
-//                    
-//                    Text("Lineups not available")
-//                        .font(.headline)
-//                    
-//                    Text("They will be announced shortly before kickoff.")
-//                        .font(.caption)
-//                        .foregroundColor(.secondary)
-//                }
-//                .padding()
             } else if vm.lineups.count == 2 {
                 
                 ScrollView {

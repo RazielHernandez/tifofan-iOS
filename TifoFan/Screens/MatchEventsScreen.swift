@@ -61,24 +61,6 @@ struct MatchEventsScreen: View {
         }
     }
     
-//    private var emptyState: some View {
-//        
-//        VStack(spacing: 16) {
-//            
-//            Image(systemName: iconName)
-//                .font(.largeTitle)
-//                .foregroundColor(.gray)
-//            
-//            Text(titleText)
-//                .font(.headline)
-//            
-//            Text(subtitleText)
-//                .font(.caption)
-//                .foregroundColor(.secondary)
-//        }
-//        .padding(.top, 40)
-//    }
-    
     private var iconName: String {
         match.status == "NS" ? "clock" : "bolt.horizontal"
     }
