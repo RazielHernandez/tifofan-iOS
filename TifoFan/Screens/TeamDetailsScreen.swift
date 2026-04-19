@@ -202,6 +202,10 @@ extension TeamDetailsScreen {
         }
     }
     
+    private func isLiveMatch(_ match: Match) -> Bool {
+        ["1H", "2H", "HT"].contains(match.status)
+    }
+    
     private var matchesView: some View {
         
         ScrollViewReader { proxy in
@@ -210,12 +214,19 @@ extension TeamDetailsScreen {
                     
                     ForEach(sortedMatches) { match in
                         
+//                        if match.id == nextMatch?.id {
+//                            Text("TODAY")
+//                                .font(.caption)
+//                                .fontWeight(.bold)
+//                                .foregroundColor(.blue)
+//                                .frame(maxWidth: .infinity, alignment: .leading)
+//                                .padding(.horizontal)
+//                        }
                         if match.id == nextMatch?.id {
-                            Text("TODAY")
+                            Text(isLiveMatch(match) ? "LIVE NOW" : "UPCOMING")
                                 .font(.caption)
                                 .fontWeight(.bold)
-                                .foregroundColor(.blue)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .foregroundColor(isLiveMatch(match) ? .red : .blue)
                                 .padding(.horizontal)
                         }
                         
@@ -243,7 +254,9 @@ extension TeamDetailsScreen {
         guard !sortedMatches.isEmpty else { return }
         
         DispatchQueue.main.async {
-            if let next = nextMatch {
+            if let live = sortedMatches.first(where: { isLiveMatch($0) }) {
+                proxy.scrollTo(live.id, anchor: .center)
+            } else if let next = nextMatch {
                 proxy.scrollTo(next.id, anchor: .center)
             } else if let last = sortedMatches.last {
                 proxy.scrollTo(last.id, anchor: .bottom)

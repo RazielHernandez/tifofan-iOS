@@ -13,6 +13,24 @@ enum MatchTab: String, CaseIterable {
     case mxm = "MxM"
 }
 
+enum MatchPhase {
+    case notStarted
+    case live
+    case halfTime
+    case finished
+    case unknown
+
+    init(status: String) {
+        switch status {
+        case "NS": self = .notStarted
+        case "1H", "2H": self = .live
+        case "HT": self = .halfTime
+        case "FT": self = .finished
+        default: self = .unknown
+        }
+    }
+}
+
 struct MatchDetailScreen: View {
     
     let matchId: Int
@@ -26,6 +44,11 @@ struct MatchDetailScreen: View {
             if vm.isLoading {
                 ProgressView()
             } else if let match = vm.selectedMatch {
+                
+                // LIVE MATCH BANNER
+                if MatchPhase(status: match.status) == .live {
+                    LiveMatchBanner()
+                }
                 
                 // HEADER
                 MatchHeaderView(match: match)
@@ -57,7 +80,7 @@ struct MatchDetailScreen: View {
                     case .lineups:
                         LineupsView(matchId: matchId)
                     case .mxm:
-                        MatchEventsScreen(matchId: matchId)
+                        MatchEventsScreen(matchId: matchId, match: match)
                     }
                 }
             }
@@ -66,31 +89,109 @@ struct MatchDetailScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await vm.fetchMatchDetail(matchId: matchId)
-            await vm.fetchMatchStatistics(matchId: matchId)
+            //await vm.fetchMatchStatistics(matchId: matchId)
         }
     }
 }
 
+struct LiveMatchBanner: View {
+    var body: some View {
+        HStack {
+            Circle()
+                .fill(.red)
+                .frame(width: 8, height: 8)
+                .scaleEffect(1.2)
+                .animation(.easeInOut(duration: 0.8).repeatForever(), value: true)
+
+            Text("LIVE MATCH")
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundColor(.red)
+
+            Spacer()
+        }
+        .padding(10)
+        .background(Color.red.opacity(0.08))
+        .cornerRadius(10)
+        .padding(.horizontal)
+    }
+}
+
 struct MatchHeaderView: View {
-    
+
     let match: MatchDetail
-    
+
+    var phase: MatchPhase {
+        MatchPhase(status: match.status)
+    }
+
     var body: some View {
         VStack(spacing: 12) {
-            
+
             HStack {
                 TeamBlock(team: match.home.team)
+
                 Spacer()
+
                 ScoreBlock(match: match)
+
                 Spacer()
+
                 TeamBlock(team: match.away.team)
             }
-            
-            Text(match.status)
-                .font(.caption)
-                .foregroundColor(.gray)
+
+            statusBadge
         }
         .padding()
+    }
+
+    private var statusBadge: some View {
+        HStack(spacing: 6) {
+
+            if phase == .live {
+                Circle()
+                    .fill(Color.red)
+                    .frame(width: 8, height: 8)
+                    .scaleEffect(1.2)
+                    .opacity(0.8)
+                    .animation(.easeInOut(duration: 0.8).repeatForever(), value: phase)
+
+                Text("LIVE")
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.red)
+
+            } else {
+
+                Image(systemName: icon)
+                    .font(.caption2)
+
+                Text(text)
+                    .font(.caption2)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Color.blue.opacity(0.08))
+        .cornerRadius(8)
+    }
+
+    private var icon: String {
+        switch phase {
+        case .notStarted: return "clock"
+        case .halfTime: return "pause.circle"
+        case .finished: return "flag.checkered"
+        default: return "info.circle"
+        }
+    }
+
+    private var text: String {
+        switch phase {
+        case .notStarted: return "Not started"
+        case .halfTime: return "Half time"
+        case .finished: return "Finished"
+        default: return match.status
+        }
     }
 }
 
@@ -116,27 +217,62 @@ struct TeamBlock: View {
 }
 
 struct ScoreBlock: View {
-    
+
     let match: MatchDetail
-    
+    @State private var now = Date()
+
+    var phase: MatchPhase {
+        MatchPhase(status: match.status)
+    }
+
     var body: some View {
-        VStack {
-            Text("\(goals(match.home.goals)) - \(goals(match.away.goals))")
+        VStack(spacing: 6) {
+
+            Text(scoreText)
                 .font(.title)
                 .bold()
-            
-            Text(match.date, style: .time)
+
+            Text(subtitleText)
                 .font(.caption)
                 .foregroundColor(.gray)
         }
-    }
-    
-    private func goals(_ value: Int?) -> String {
-        if let value = value {
-            return "\(value)"
-        } else {
-            return "-"
+        .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+                now = Date()
+            }
         }
+    }
+
+    private var scoreText: String {
+        "\(match.home.goals ?? 0) - \(match.away.goals ?? 0)"
+    }
+
+    private var subtitleText: String {
+
+        switch phase {
+
+        case .notStarted:
+            let diff = Int(match.date.timeIntervalSince(now))
+            let minutes = max(diff / 60, 0)
+            return "Starts in \(minutes)m"
+
+        case .live:
+            return "LIVE • \(liveMinutes)'"
+
+        case .halfTime:
+            return "Half Time"
+
+        case .finished:
+            return "Full Time"
+
+        default:
+            return match.status
+        }
+    }
+
+    private var liveMinutes: Int {
+        let diff = Int(now.timeIntervalSince(match.date))
+        return max(diff / 60, 1)
     }
 }
 
@@ -177,42 +313,115 @@ struct StatsMatchView: View {
     let stats: [TeamMatchStatistics]
     let match: MatchDetail
     
+//    var body: some View {
+//        VStack(spacing: 12) {
+//            
+//            VStack(spacing: 12) {
+//                HStack {
+//                    Text("Date")
+//                    Spacer()
+//                    Text(match.date, style: .date)
+//                }
+//                
+//                HStack {
+//                    Text("Venue")
+//                    Spacer()
+//                    Text(match.venue ?? "N/A")
+//                }
+//            }
+//            .padding()
+//            .background(Color(.systemBackground))
+//            .cornerRadius(12)
+//            .shadow(radius: 2)
+//            
+//            
+//            VStack(spacing:12) {
+//                ForEach(statItems(), id: \.title) { item in
+//                    StatBarRow(
+//                        item: item,
+//                    )
+//                }
+//            }
+//            .padding()
+//            .background(Color(.systemBackground))
+//            .cornerRadius(12)
+//            .shadow(radius: 2)
+//            
+//        }
+//        .padding()
+//    }
+    
     var body: some View {
         VStack(spacing: 12) {
             
-            VStack(spacing: 12) {
-                HStack {
-                    Text("Date")
-                    Spacer()
-                    Text(match.date, style: .date)
-                }
+            // MATCH INFO
+            infoCard
+            
+            if stats.isEmpty {
                 
-                HStack {
-                    Text("Venue")
-                    Spacer()
-                    Text(match.venue ?? "N/A")
-                }
+                MatchEmptyState(
+                    icon: "chart.bar.xaxis",
+                    title: "No stats yet",
+                    subtitle: "Statistics will appear once the match starts."
+                )
+                
+//                VStack(spacing: 14) {
+//                    
+//                    Image(systemName: "chart.bar.xaxis")
+//                        .font(.largeTitle)
+//                        .foregroundColor(.gray)
+//                    
+//                    Text(match.status == "NS"
+//                         ? "Match hasn't started"
+//                         : "No statistics available")
+//                        .font(.headline)
+//                    
+//                    Text(match.status == "NS"
+//                         ? "Stats will appear once the game kicks off."
+//                         : "Statistics are not available for this match.")
+//                        .font(.caption)
+//                        .foregroundColor(.secondary)
+//                }
+//                .padding()
+                
+            } else {
+                
+                statsContent
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(radius: 2)
-            
-            
-            VStack(spacing:12) {
-                ForEach(statItems(), id: \.title) { item in
-                    StatBarRow(
-                        item: item,
-                    )
-                }
-            }
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(radius: 2)
-            
         }
         .padding()
+    }
+    
+    private var infoCard: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Text("Date")
+                Spacer()
+                Text(match.date, style: .date)
+            }
+            
+            HStack {
+                Text("Venue")
+                Spacer()
+                Text(match.venue ?? "N/A")
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 2)
+    }
+    
+    private var statsContent: some View {
+        VStack(spacing: 12) {
+            ForEach(statItems(), id: \.title) { item in
+                StatBarRow(item: item)
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 2)
     }
     
     private func statItems() -> [StatItemModel] {
@@ -232,6 +441,31 @@ struct StatsMatchView: View {
             StatItemModel("Yellow Cards", home.yellowCards?.value ?? 0, away.yellowCards?.value ?? 0, icon: "square.fill"),
             StatItemModel("Red Cards", home.redCards?.value ?? 0, away.redCards?.value ?? 0, icon: "stop.fill")
         ]
+    }
+}
+
+struct MatchEmptyState: View {
+
+    let icon: String
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.largeTitle)
+                .foregroundColor(.gray)
+
+            Text(title)
+                .font(.headline)
+
+            Text(subtitle)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        }
+        .padding(.top, 40)
     }
 }
 
@@ -388,6 +622,28 @@ struct LineupsView: View {
             
             if vm.isLoading {
                 ProgressView()
+            }
+            else if vm.lineups.isEmpty {
+                
+                MatchEmptyState(
+                    icon: "person.3",
+                    title: "Lineups not available",
+                    subtitle: "Teams will be announced before kickoff."
+                )
+                
+//                VStack(spacing: 14) {
+//                    Image(systemName: "person.3")
+//                        .font(.largeTitle)
+//                        .foregroundColor(.gray)
+//                    
+//                    Text("Lineups not available")
+//                        .font(.headline)
+//                    
+//                    Text("They will be announced shortly before kickoff.")
+//                        .font(.caption)
+//                        .foregroundColor(.secondary)
+//                }
+//                .padding()
             } else if vm.lineups.count == 2 {
                 
                 ScrollView {
@@ -406,7 +662,6 @@ struct LineupsView: View {
                     }
                     .padding(.bottom, 20)
                 }
-                
                 
             }
         }

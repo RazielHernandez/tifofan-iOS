@@ -54,6 +54,20 @@ final class MatchViewModel: ObservableObject {
     }
     
     // MARK: - Fetch Match Detail
+//    func fetchMatchDetail(matchId: Int) async {
+//        isLoading = true
+//        errorMessage = nil
+//        
+//        do {
+//            let response = try await service.getMatchDetail(matchId: matchId)
+//            selectedMatch = response.data
+//            
+//        } catch {
+//            handleError(error)
+//        }
+//        
+//        isLoading = false
+//    }
     func fetchMatchDetail(matchId: Int) async {
         isLoading = true
         errorMessage = nil
@@ -61,6 +75,12 @@ final class MatchViewModel: ObservableObject {
         do {
             let response = try await service.getMatchDetail(matchId: matchId)
             selectedMatch = response.data
+            
+            if response.data.status != "NS" {
+                await fetchMatchStatistics(matchId: matchId)
+            } else {
+                statistics = []
+            }
             
         } catch {
             handleError(error)
@@ -85,6 +105,8 @@ final class MatchViewModel: ObservableObject {
         
         isLoading = false
     }
+    
+    // MARK: - Fetch Matches by Team
     
     func fetchMatchesByTeam(
         teamId: Int,
@@ -111,6 +133,8 @@ final class MatchViewModel: ObservableObject {
         isLoading = false
     }
     
+    // MARK: - fetch Matches by date (one day)
+    
     func fetchMatchesByDate(
         date: Date
     ) async {
@@ -131,6 +155,8 @@ final class MatchViewModel: ObservableObject {
         
         isLoading = false
     }
+    
+    // MARK: - Fetch Matches by round
     
     func fetchMatchesByRound(
         leagueId: Int,
@@ -158,6 +184,8 @@ final class MatchViewModel: ObservableObject {
         
         isLoading = false
     }
+    
+    // MARK: - Assign adn print the error (debugging)
     
     private func handleError(_ error: Error) {
         errorMessage = error.localizedDescription
