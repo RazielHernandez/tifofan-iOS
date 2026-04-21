@@ -71,7 +71,8 @@ struct StandingsScreen: View {
                                 StandingsRowView(
                                     row: row,
                                     mode: mode,
-                                    leagueId: leagueId
+                                    leagueId: leagueId,
+                                    season: season
                                 )
                                 Divider()
                             }
@@ -85,6 +86,11 @@ struct StandingsScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await vm.fetchStandings(league: leagueId, season: season)
+        }
+        .onChange(of: season) {
+            Task {
+                await vm.fetchStandings(league: leagueId, season: season)
+            }
         }
     }
 }
@@ -134,6 +140,14 @@ struct LeagueStatsView: View {
         }
         .task {
             if vm.stats == nil {
+                await vm.fetchStats(
+                    league: leagueId,
+                    season: season
+                )
+            }
+        }
+        .onChange(of: season) {
+            Task {
                 await vm.fetchStats(
                     league: leagueId,
                     season: season
@@ -268,6 +282,7 @@ struct StandingsRowView: View {
     let row: StandingsRow
     let mode: StandingMode
     let leagueId: Int
+    let season: Int
     
     var stats: Stats {
         switch mode {
@@ -305,7 +320,11 @@ struct StandingsRowView: View {
     
     var body: some View {
         NavigationLink {
-            TeamDetailsScreen(team: row.team, leagueId: leagueId)
+            TeamDetailsScreen(
+                team: row.team,
+                leagueId: leagueId,
+                season: season
+            )
         } label: {
             content
         }

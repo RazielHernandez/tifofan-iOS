@@ -47,7 +47,7 @@ final class MatchViewModel: ObservableObject {
             
             currentFilter = .league
         } catch {
-            handleError(error)
+            handleError(error, functionName: "fetchMatches")
         }
         
         isLoading = false
@@ -69,7 +69,7 @@ final class MatchViewModel: ObservableObject {
             }
             
         } catch {
-            handleError(error)
+            handleError(error, functionName: "fetchMatchDetail")
         }
         
         isLoading = false
@@ -86,7 +86,7 @@ final class MatchViewModel: ObservableObject {
             statistics = response.data
             
         } catch {
-            handleError(error)
+            handleError(error, functionName: "fetchMatchStatistics")
         }
         
         isLoading = false
@@ -113,7 +113,7 @@ final class MatchViewModel: ObservableObject {
             
             currentFilter = .team
         } catch {
-            handleError(error)
+            handleError(error, functionName: "fetchMatchesByTeam")
         }
         
         isLoading = false
@@ -136,7 +136,7 @@ final class MatchViewModel: ObservableObject {
             
             currentFilter = .date
         } catch {
-            handleError(error)
+            handleError(error, functionName: "fetchMatchesByDate")
         }
         
         isLoading = false
@@ -165,7 +165,7 @@ final class MatchViewModel: ObservableObject {
             
             currentFilter = .round
         } catch {
-            handleError(error)
+            handleError(error, functionName: "Matches by Round")
         }
         
         isLoading = false
@@ -173,9 +173,10 @@ final class MatchViewModel: ObservableObject {
     
     // MARK: - Assign adn print the error (debugging)
     
-    private func handleError(_ error: Error) {
+    private func handleError(_ error: Error, functionName: String) {
         errorMessage = error.localizedDescription
         
+        print("🔥 [\(functionName)] Error:")
         print("🔥 FULL ERROR:", error)
         
         if let nsError = error as NSError? {

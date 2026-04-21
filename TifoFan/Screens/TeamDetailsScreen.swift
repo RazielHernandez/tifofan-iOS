@@ -17,14 +17,12 @@ struct TeamDetailsScreen: View {
     
     let team: TeamSummary
     let leagueId: Int
+    let season: Int
     
     @EnvironmentObject var favoritesVM: FavoritesViewModel
     @StateObject private var vm = TeamDetailsViewModel()
     @StateObject private var matchVM = MatchViewModel()
     @State private var selectedTab: TeamTab = .overview
-    
-    
-    private let season = 2025
     
     private var isFavorite: Bool {
         favoritesVM.favoriteTeamIds.contains(team.id)
@@ -192,7 +190,8 @@ extension TeamDetailsScreen {
                 case .players:
                     TeamPlayersListView(
                         teamId: team.id,
-                        leagueId: leagueId
+                        leagueId: leagueId,
+                        season: season
                     )
                 case .matches:
                     matchesView
@@ -214,14 +213,6 @@ extension TeamDetailsScreen {
                     
                     ForEach(sortedMatches) { match in
                         
-//                        if match.id == nextMatch?.id {
-//                            Text("TODAY")
-//                                .font(.caption)
-//                                .fontWeight(.bold)
-//                                .foregroundColor(.blue)
-//                                .frame(maxWidth: .infinity, alignment: .leading)
-//                                .padding(.horizontal)
-//                        }
                         if match.id == nextMatch?.id {
                             Text(isLiveMatch(match) ? "LIVE NOW" : "UPCOMING")
                                 .font(.caption)

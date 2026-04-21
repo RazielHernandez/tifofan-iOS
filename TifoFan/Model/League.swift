@@ -7,13 +7,83 @@
 
 import Foundation
 
+//struct League: Codable, Identifiable {
+//    let id: Int
+//    let name: String
+//    let country: String
+//    let countryCode: String
+//    let fromSeason: Int
+//    let logo: URL?
+//}
 struct League: Codable, Identifiable {
     let id: Int
     let name: String
     let country: String
     let countryCode: String
-    let fromSeason: Int
     let logo: URL?
+    let seasons: [Season]
+}
+
+extension League {
+    
+    var currentSeason: Int {
+        seasons.first(where: { $0.current })?.year
+        ?? seasons.last?.year
+        ?? 2025
+    }
+    
+    var availableSeasons: [Int] {
+        seasons.map { $0.year }.sorted(by: >)
+    }
+}
+
+struct LeagueFavorite: Codable {
+    let id: Int
+    let name: String
+    let country: String?
+    let logo: String?
+}
+
+struct Season: Codable, Identifiable {
+    var id: Int { year }
+    
+    let year: Int
+    let start: String
+    let end: String
+    let current: Bool
+    let coverage: Coverage
+}
+
+struct Coverage: Codable {
+    let fixtures: FixtureCoverage
+    let standings: Bool
+    let players: Bool
+    let topScorers: Bool
+    let topAssists: Bool
+    let topCards: Bool
+    let injuries: Bool
+    let predictions: Bool
+    let odds: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case fixtures, standings, players, injuries, predictions, odds
+        case topScorers = "top_scorers"
+        case topAssists = "top_assists"
+        case topCards = "top_cards"
+    }
+}
+
+struct FixtureCoverage: Codable {
+    let events: Bool
+    let lineups: Bool
+    let statisticsFixtures: Bool
+    let statisticsPlayers: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case events, lineups
+        case statisticsFixtures = "statistics_fixtures"
+        case statisticsPlayers = "statistics_players"
+    }
 }
 
 struct LeagueStats: Codable {

@@ -19,6 +19,12 @@ struct LeagueDetailView: View {
     let league: League
     
     @State private var selectedTab: LeagueTab = .teams
+    @State private var selectedSeason: Int
+    
+    init(league: League) {
+        self.league = league
+        _selectedSeason = State(initialValue: league.currentSeason)
+    }
     
     var body: some View {
         VStack {
@@ -33,6 +39,14 @@ struct LeagueDetailView: View {
                 .frame(width: 80, height: 80)
             }
             .padding()
+            
+            Picker("Season", selection: $selectedSeason) {
+                ForEach(league.availableSeasons, id: \.self) { year in
+                    Text("\(year)").tag(year)
+                }
+            }
+            .pickerStyle(.menu)
+            .padding(.horizontal)
             
             // TAB BAR
             HStack {
@@ -57,11 +71,23 @@ struct LeagueDetailView: View {
             // CONTENT
             switch selectedTab {
             case .teams:
-                TeamsView(league: league, vm: LeagueViewModel())
+                TeamsView(
+                    league: league,
+                    season: selectedSeason,
+                    vm: LeagueViewModel()
+                )
             case .standings:
-                StandingsScreen(leagueId: league.id, season: 2025, vm: StandingsViewModel())
+                StandingsScreen(
+                    leagueId: league.id,
+                    season: selectedSeason,
+                    vm: StandingsViewModel()
+                )
             case .fixtures:
-                FixturesView(league: league, vm: MatchViewModel())
+                FixturesView(
+                    league: league,
+                    season: selectedSeason,
+                    vm: MatchViewModel()
+                )
             case .news:
                 Text("News coming soon")
                 Spacer()
@@ -76,9 +102,10 @@ struct LeagueDetailView: View {
 struct FixturesView: View {
     
     let league: League
-    @ObservedObject var vm: MatchViewModel
+    let season: Int
     
-    private let season = 2024
+    @ObservedObject var vm: MatchViewModel
+//    private let season = 2024
     
     var body: some View {
         VStack {
@@ -110,6 +137,14 @@ struct FixturesView: View {
                 season: season
             )
         }
+        .onChange(of: season) {
+            Task {
+                await vm.fetchMatches(
+                    leagueId: league.id,
+                    season: season
+                )
+            }
+        }
     }
 }
 
@@ -117,10 +152,11 @@ struct TeamPlayersListView: View {
     
     let teamId: Int
     let leagueId: Int
+    let season: Int
     
     @StateObject private var vm = TeamPlayersViewModel()
     
-    private let season = 2024
+//    private let season = 2024
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -164,6 +200,15 @@ struct TeamPlayersListView: View {
                 leagueId: leagueId,
                 season: season
             )
+        }
+        .onChange(of: season) {
+            Task {
+                await vm.fetchFirstPage(
+                    teamId: teamId,
+                    leagueId: leagueId,
+                    season: season
+                )
+            }
         }
     }
 }

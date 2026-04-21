@@ -10,11 +10,13 @@ import SwiftUI
 struct TeamsView: View {
     
     let league: League
+    let season: Int
+    
     @ObservedObject var vm: LeagueViewModel
     
     @EnvironmentObject var favoritesVM: FavoritesViewModel
     
-    private let season = 2025
+//    private let season = 2025
     
     private var favoriteTeams: [TeamSummary] {
         vm.teams.filter { favoritesVM.favoriteTeamIds.contains($0.id) }
@@ -72,8 +74,16 @@ struct TeamsView: View {
                 )
             }
             
-            // 🔥 Load favorites (important)
             if favoritesVM.favoriteTeamIds.isEmpty {
+                await favoritesVM.fetchFavorites()
+            }
+        }
+        .onChange(of: season) {
+            Task {
+                await vm.fetchLeaguesWithTeams(
+                    league: league.id,
+                    season: season
+                )
                 await favoritesVM.fetchFavorites()
             }
         }
@@ -83,7 +93,8 @@ struct TeamsView: View {
         NavigationLink {
             TeamDetailsScreen(
                 team: team,
-                leagueId: league.id
+                leagueId: league.id,
+                season: season
             )
         } label: {
             TeamRow(

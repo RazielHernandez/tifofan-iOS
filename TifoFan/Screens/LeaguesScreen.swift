@@ -58,7 +58,6 @@ struct LeaguesScreen: View {
                             
                             Spacer()
                             
-                            // ❤️ Favorite button
                             Button {
                                 Task {
                                     await favoritesVM.toggleLeague(league)

@@ -12,6 +12,6 @@ struct SuccessResponse: Codable {
 }
 
 struct FavoritesData: Codable {
-    let leagues: [League]
+    let leagues: [LeagueFavorite]
     let teams: [TeamSummary]
 }
