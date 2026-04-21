@@ -99,3 +99,29 @@ struct FlexibleInt: Codable {
         }
     }
 }
+
+extension FlexibleInt {
+    init(_ value: Int) {
+        self.value = value
+    }
+}
+
+//extension FlexibleInt: CustomStringConvertible {
+//    var description: String {
+//        if let value {
+//            return "\(value)"
+//        } else {
+//            return "-"
+//        }
+//    }
+//}
+
+extension FlexibleInt {
+    var intValue: Int {
+        value ?? 0
+    }
+    
+    var displayValue: String {
+        value != nil ? "\(value!)" : "-"
+    }
+}

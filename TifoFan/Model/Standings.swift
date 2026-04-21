@@ -50,17 +50,17 @@ struct StandingsRow: Codable, Identifiable {
 }
 
 struct BasicStats: Codable {
-    let played: Int
-    let win: Int
-    let draw: Int
-    let lose: Int
+    let played: FlexibleInt
+    let win: FlexibleInt
+    let draw: FlexibleInt
+    let lose: FlexibleInt
 }
 
 struct Stats: Codable {
-    let played: Int
-    let win: Int
-    let draw: Int
-    let lose: Int
-    let goalsFor: Int
-    let goalsAgainst: Int
+    let played: FlexibleInt
+    let win: FlexibleInt
+    let draw: FlexibleInt
+    let lose: FlexibleInt
+    let goalsFor: FlexibleInt
+    let goalsAgainst: FlexibleInt
 }

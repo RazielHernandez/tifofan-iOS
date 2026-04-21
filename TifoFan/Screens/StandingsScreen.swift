@@ -294,8 +294,8 @@ struct StandingsRowView: View {
                 win: row.home.win,
                 draw: row.home.draw,
                 lose: row.home.lose,
-                goalsFor: 0,
-                goalsAgainst: 0
+                goalsFor: FlexibleInt(0),
+                goalsAgainst: FlexibleInt(0)
             )
         case .away:
             return Stats(
@@ -303,17 +303,17 @@ struct StandingsRowView: View {
                 win: row.away.win,
                 draw: row.away.draw,
                 lose: row.away.lose,
-                goalsFor: 0,
-                goalsAgainst: 0
+                goalsFor: FlexibleInt(0),
+                goalsAgainst: FlexibleInt(0),
             )
         case .stats:
             return Stats(
-                played: 0,
-                win: 0,
-                draw: 0,
-                lose: 0,
-                goalsFor: 0,
-                goalsAgainst: 0
+                played: FlexibleInt(0),
+                win: FlexibleInt(0),
+                draw: FlexibleInt(0),
+                lose: FlexibleInt(0),
+                goalsFor: FlexibleInt(0),
+                goalsAgainst: FlexibleInt(0),
             )
         }
     }
@@ -359,13 +359,13 @@ struct StandingsRowView: View {
                 
                 Spacer()
                 
-                Text("\(stats.played)").frame(width: 30)
-                Text("\(stats.win)").frame(width: 30)
-                Text("\(stats.draw)").frame(width: 30)
-                Text("\(stats.lose)").frame(width: 30)
+                Text(stats.played.displayValue).frame(width: 30)
+                Text(stats.win.displayValue).frame(width: 30)
+                Text(stats.draw.displayValue).frame(width: 30)
+                Text(stats.lose.displayValue).frame(width: 30)
                 
-                Text("\(stats.goalsFor)").frame(width: 40)
-                Text("\(stats.goalsAgainst)").frame(width: 40)
+                Text(stats.goalsFor.displayValue).frame(width: 40)
+                Text(stats.goalsAgainst.displayValue).frame(width: 40)
                 
                 Text("\(row.goalsDiff)")
                     .frame(width: 40)
