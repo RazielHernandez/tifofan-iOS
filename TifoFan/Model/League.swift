@@ -51,7 +51,7 @@ struct Season: Codable, Identifiable {
     let start: String
     let end: String
     let current: Bool
-    let coverage: Coverage
+    let coverage: Coverage?
 }
 
 struct Coverage: Codable {
