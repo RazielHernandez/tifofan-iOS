@@ -12,6 +12,8 @@ import SwiftUI
 struct DashboardScreen: View {
     
     @State private var isLoading = false
+    @StateObject private var viewModel = LeagueViewModel()
+    @EnvironmentObject var favoritesVM: FavoritesViewModel
     
     var body: some View {
         NavigationView {
@@ -19,7 +21,14 @@ struct DashboardScreen: View {
                 VStack(spacing: 20) {
                     
                     // 🔥 TIFO CARD
-                    TifoCard()
+                    NavigationLink {
+                        TifoGeneratorScreen(
+                            favoritesVM: FavoritesViewModel()
+                        )
+                    } label: {
+                        TifoCard()
+                    }
+                    .buttonStyle(.plain)
                     
                     // 🔥 QUICK ACTIONS
                     QuickActions()
@@ -49,7 +58,7 @@ struct TifoCard: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             
-            Image("tifo_placeholder")
+            Image("TifoPlaceholder")
                 .resizable()
                 .scaledToFill()
                 .frame(height: 200)

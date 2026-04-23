@@ -337,3 +337,29 @@ extension FirebaseService {
         )
     }
 }
+
+// MARK: - TIFO
+
+extension FirebaseService {
+    
+    func saveTifo(
+        teamId: Int,
+        rows: Int,
+        cols: Int,
+        cells: String,
+        type: String = "base"
+    ) async throws -> APIResponse<SuccessResponse> {
+        
+        try await callFunction(
+            name: "v1-saveTifo",
+            data: [
+                "teamId": teamId,
+                "rows": rows,
+                "cols": cols,
+                "cells": cells,
+                "type": type
+            ],
+            responseType: APIResponse<SuccessResponse>.self
+        )
+    }
+}

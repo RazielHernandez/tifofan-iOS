@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import SwiftData
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
@@ -28,5 +29,6 @@ struct TifoFanApp: App {
             RootView()
                 .environmentObject(favoritesVM)
         }
+        .modelContainer(for: [LocalTifo.self])
     }
 }
