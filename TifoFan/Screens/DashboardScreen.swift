@@ -6,8 +6,7 @@
 //
 
 import SwiftUI
-
-import SwiftUI
+import SwiftData
 
 struct DashboardScreen: View {
     
@@ -22,9 +21,7 @@ struct DashboardScreen: View {
                     
                     // 🔥 TIFO CARD
                     NavigationLink {
-                        TifoGeneratorScreen(
-                            favoritesVM: FavoritesViewModel()
-                        )
+                        TifoGeneratorScreen(favoritesVM: favoritesVM)
                     } label: {
                         TifoCard()
                     }
@@ -55,15 +52,15 @@ struct DashboardScreen: View {
 // MARK: - TIFO CARD
 
 struct TifoCard: View {
+    
+    @Environment(\.modelContext) private var context
+    @State private var firstTifo: TifoGrid?
+    
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             
-            Image("TifoPlaceholder")
-                .resizable()
-                .scaledToFill()
+            TifoView(grid: firstTifo)
                 .frame(height: 200)
-                .clipped()
-                .cornerRadius(16)
             
             LinearGradient(
                 colors: [.black.opacity(0.7), .clear],
@@ -83,8 +80,55 @@ struct TifoCard: View {
             }
             .padding()
         }
+        .onAppear {
+            loadFirstTifo()
+        }
+    }
+    
+    func loadFirstTifo() {
+        let db = LocalDatabase(context: context)
+        
+        if let first = try? db.fetchFirstTifo() {
+            firstTifo = TifoGrid(
+                rows: first.rows,
+                cols: first.cols,
+                cells: first.cells
+            )
+        }
     }
 }
+
+//struct TifoCard: View {
+//    var body: some View {
+//        ZStack(alignment: .bottomLeading) {
+//            
+//            Image("TifoPlaceholder")
+//                .resizable()
+//                .scaledToFill()
+//                .frame(height: 200)
+//                .clipped()
+//                .cornerRadius(16)
+//            
+//            LinearGradient(
+//                colors: [.black.opacity(0.7), .clear],
+//                startPoint: .bottom,
+//                endPoint: .top
+//            )
+//            .cornerRadius(16)
+//            
+//            VStack(alignment: .leading, spacing: 6) {
+//                Text("Create Your Tifo")
+//                    .font(.headline)
+//                    .foregroundColor(.white)
+//                
+//                Text("Design and share with fans")
+//                    .font(.caption)
+//                    .foregroundColor(.white.opacity(0.8))
+//            }
+//            .padding()
+//        }
+//    }
+//}
 
 // MARK: - QUICK ACTIONS
 

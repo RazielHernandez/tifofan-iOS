@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TeamSummary: Codable, Identifiable {
+struct TeamSummary: Codable, Identifiable, Hashable {
     let id: Int
     let name: String
     let logo: URL?

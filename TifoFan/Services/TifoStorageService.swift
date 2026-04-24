@@ -39,6 +39,13 @@ final class TifoStorageService {
         try db.save(localTifo)
     }
     
+    func deleteTifo(teamId: Int) async throws {
+        
+        try await FirebaseService.shared.deleteTifo(teamId: teamId)
+        
+        try db.deleteTifo(teamId: teamId)
+    }
+    
     func compressRLE(_ cells: [String]) -> String {
         guard !cells.isEmpty else { return "" }
         
@@ -59,5 +66,9 @@ final class TifoStorageService {
         result.append("\(count):\(current)")
         
         return result.joined(separator: ",")
+    }
+    
+    func getLocalTifo(teamId: Int) -> LocalTifo? {
+        return try? db.fetchTifo(teamId: teamId)
     }
 }

@@ -10,26 +10,91 @@ import SwiftUI
 
 final class TifoGenerator {
     
+//    func generate(from url: URL, rows: Int, cols: Int) async throws -> TifoGrid {
+//        
+//        let image = try await downloadImage(from: url)
+//        
+//        guard let cgImage = resizeImage(image, targetSize: CGSize(width: cols, height: rows)) else {
+//            throw NSError(domain: "ResizeError", code: 0)
+//        }
+//        
+//        let pixels = extractPixels(from: cgImage)
+//        
+//        var cells: [String] = []
+//        cells.reserveCapacity(rows * cols)
+//        
+//        for color in pixels {
+//            let quantized = quantize(color, levels: 10)
+//            let hex = toHex(quantized)
+//            cells.append(hex)
+//        }
+//        
+//        return TifoGrid(rows: rows, cols: cols, cells: cells)
+//    }
     func generate(from url: URL, rows: Int, cols: Int) async throws -> TifoGrid {
         
         let image = try await downloadImage(from: url)
         
-        guard let cgImage = resizeImage(image, targetSize: CGSize(width: cols, height: rows)) else {
-            throw NSError(domain: "ResizeError", code: 0)
+        guard let cgImage = image.cgImage else {
+            throw NSError(domain: "CGImageError", code: 0)
         }
         
-        let pixels = extractPixels(from: cgImage)
+        let pixels = sampleGrid(from: cgImage, rows: rows, cols: cols)
         
-        var cells: [String] = []
-        cells.reserveCapacity(rows * cols)
-        
-        for color in pixels {
-            let quantized = quantize(color, levels: 6)
-            let hex = toHex(quantized)
-            cells.append(hex)
+        let cells = pixels.map { color -> String in
+            let quantized = quantize(color, levels: 12)
+            return toHex(quantized)
         }
         
         return TifoGrid(rows: rows, cols: cols, cells: cells)
+    }
+    
+    func sampleGrid(from cgImage: CGImage, rows: Int, cols: Int) -> [UIColor] {
+        
+        let width = cgImage.width
+        let height = cgImage.height
+        
+//        let cellWidth = width / cols
+//        let cellHeight = height / rows
+        let cellWidth = CGFloat(width) / CGFloat(cols)
+        let cellHeight = CGFloat(height) / CGFloat(rows)
+        
+        guard let dataProvider = cgImage.dataProvider,
+              let data = dataProvider.data else {
+            return []
+        }
+        
+        let ptr = CFDataGetBytePtr(data)!
+        
+        var colors: [UIColor] = []
+        colors.reserveCapacity(rows * cols)
+        
+        for row in 0..<rows {
+            for col in 0..<cols {
+                
+//                let x = col * cellWidth + cellWidth / 2
+//                let y = row * cellHeight + cellHeight / 2
+                let x = Int((CGFloat(col) + 0.5) * cellWidth)
+                let y = Int((CGFloat(row) + 0.5) * cellHeight)
+                
+//                let index = ((y * width) + x) * 4
+                let bytesPerRow = cgImage.bytesPerRow
+                let index = y * bytesPerRow + x * 4
+                
+                let r = CGFloat(ptr[index]) / 255.0
+                let g = CGFloat(ptr[index + 1]) / 255.0
+                let b = CGFloat(ptr[index + 2]) / 255.0
+                let a = CGFloat(ptr[index + 3]) / 255.0
+                
+                if a < 0.1 {
+                    colors.append(.clear)
+                } else {
+                    colors.append(UIColor(red: r, green: g, blue: b, alpha: 1))
+                }
+            }
+        }
+        
+        return colors
     }
     
     func downloadImage(from url: URL) async throws -> UIImage {
@@ -42,17 +107,46 @@ final class TifoGenerator {
         return image
     }
     
+//    func resizeImage(_ image: UIImage, targetSize: CGSize) -> CGImage? {
+//        let renderer = UIGraphicsImageRenderer(size: targetSize)
+//        
+//        let resized = renderer.image { _ in
+//            image.draw(in: CGRect(origin: .zero, size: targetSize))
+//        }
+//        
+//        return resized.cgImage
+//    }
     func resizeImage(_ image: UIImage, targetSize: CGSize) -> CGImage? {
+        
+        let aspectWidth = targetSize.width / image.size.width
+        let aspectHeight = targetSize.height / image.size.height
+        let aspectRatio = min(aspectWidth, aspectHeight)
+
+        let newSize = CGSize(
+            width: image.size.width * aspectRatio,
+            height: image.size.height * aspectRatio
+        )
+        
         let renderer = UIGraphicsImageRenderer(size: targetSize)
         
         let resized = renderer.image { _ in
-            image.draw(in: CGRect(origin: .zero, size: targetSize))
+            UIColor.clear.setFill()
+            UIBezierPath(rect: CGRect(origin: .zero, size: targetSize)).fill()
+            
+            let origin = CGPoint(
+                x: (targetSize.width - newSize.width) / 2,
+                y: (targetSize.height - newSize.height) / 2
+            )
+            
+            image.draw(in: CGRect(origin: origin, size: newSize))
         }
         
         return resized.cgImage
     }
     
     func extractPixels(from cgImage: CGImage) -> [UIColor] {
+        
+        
         let width = cgImage.width
         let height = cgImage.height
         
@@ -77,6 +171,11 @@ final class TifoGenerator {
             let g = CGFloat(pixels[i+1]) / 255.0
             let b = CGFloat(pixels[i+2]) / 255.0
             let a = CGFloat(pixels[i+3]) / 255.0
+            
+            if a < 0.1 {
+                colors.append(.clear)
+                continue
+            }
             
             colors.append(UIColor(red: r, green: g, blue: b, alpha: a))
         }
@@ -130,7 +229,7 @@ final class TifoGenerator {
         cells.reserveCapacity(rows * cols)
         
         for color in pixels {
-            let quantized = quantize(color, levels: 6)
+            let quantized = quantize(color, levels: 10)
             let hex = toHex(quantized)
             cells.append(hex)
         }

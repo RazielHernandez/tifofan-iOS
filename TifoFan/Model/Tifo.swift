@@ -34,3 +34,13 @@ final class LocalTifo {
         self.createdAt = Date()
     }
 }
+
+extension LocalTifo {
+    func toGrid() -> TifoGrid {
+        TifoGrid(
+            rows: rows,
+            cols: cols,
+            cells: cells
+        )
+    }
+}

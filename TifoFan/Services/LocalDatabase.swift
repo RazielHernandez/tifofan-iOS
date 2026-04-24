@@ -30,6 +30,25 @@ final class LocalDatabase {
         return try context.fetch(descriptor).first
     }
     
+    func deleteTifo(teamId: Int) throws {
+        let descriptor = FetchDescriptor<LocalTifo>(
+            predicate: #Predicate<LocalTifo> { $0.teamId == teamId }
+        )
+        
+        let results = try context.fetch(descriptor)
+        
+        for item in results {
+            context.delete(item)
+        }
+        
+        try context.save()
+    }
+    
+    func fetchFirstTifo() throws -> LocalTifo? {
+        let descriptor = FetchDescriptor<LocalTifo>()
+        return try context.fetch(descriptor).first
+    }
+    
     func exists(teamId: Int) throws -> Bool {
         try fetchTifo(teamId: teamId) != nil
     }

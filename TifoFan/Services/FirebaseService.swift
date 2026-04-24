@@ -362,4 +362,12 @@ extension FirebaseService {
             responseType: APIResponse<SuccessResponse>.self
         )
     }
+    
+    func deleteTifo(teamId: Int) async throws {
+        _ = try await callFunction(
+            name: "v1-deleteTifo",
+            data: ["teamId": teamId],
+            responseType: APIResponse<SuccessResponse>.self
+        )
+    }
 }
