@@ -171,6 +171,28 @@ final class MatchViewModel: ObservableObject {
         isLoading = false
     }
     
+    // MARK: - Helpers for Dashboard
+
+    func nextMatch(for leagueId: Int) -> Match? {
+        let now = Date()
+        
+        return matches
+            .sorted { $0.date < $1.date }
+            .first { $0.date >= now }
+    }
+
+    func nextMatch(forTeam teamId: Int) -> Match? {
+        let now = Date()
+        
+        return matches
+            .filter {
+                $0.home.team.id == teamId ||
+                $0.away.team.id == teamId
+            }
+            .sorted { $0.date < $1.date }
+            .first { $0.date >= now }
+    }
+    
     // MARK: - Assign adn print the error (debugging)
     
     private func handleError(_ error: Error, functionName: String) {

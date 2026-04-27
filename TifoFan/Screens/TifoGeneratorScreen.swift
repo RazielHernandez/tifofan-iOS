@@ -10,80 +10,62 @@ import SwiftData
 
 struct TifoGeneratorScreen: View {
     
-    @Environment(\.modelContext) private var context
+    @EnvironmentObject var tifoVM: TifoViewModel
+    let team: TeamSummary
     
-    @State private var selectedTeam: TeamSummary?
-    @StateObject private var tifoVM = TifoViewModel()
-    @ObservedObject var favoritesVM: FavoritesViewModel
     
     var body: some View {
         VStack(spacing: 16) {
             
-            Text("Tifo Builder")
+            // 🔥 TITLE (Team Name)
+            Text(team.name)
                 .font(.largeTitle.bold())
+                .frame(maxWidth: .infinity, alignment: .leading)
             
-            // MARK: - TEAM PICKER
-            if favoritesVM.favoriteTeamIds.isEmpty {
-                Spacer()
-                Text("No favourite teams saved")
-                    .foregroundColor(.secondary)
-                Spacer()
-            } else {
+            // 🏟️ TIFO WITH STADIUM BACKGROUND
+            ZStack {
                 
-                Picker("Select Team", selection: $selectedTeam) {
-                    ForEach(Array(favoritesVM.favoriteTeamIds), id: \.self) { teamId in
-                        if let team = getTeam(teamId: teamId) {
-                            HStack {
-                                AsyncImage(url: team.logo) { image in
-                                    image.resizable()
-                                } placeholder: {
-                                    ProgressView()
-                                }
-                                .frame(width: 24, height: 24)
-                                
-                                Text(team.name)
-                            }
-                            .tag(Optional(team))
-                        }
-                    }
-                }
-                .pickerStyle(.menu)
+                // Stadium background
+                Image("stadium_bg") // 👉 add to assets
+                    .resizable()
+                    .scaledToFill()
+                    .overlay(Color.black.opacity(0.35))
+                    .clipped()
+                
+                // Tifo
+                TifoView(grid: tifoVM.generatedTifo)
+                    .padding(16)
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: 260)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             
-            // MARK: - TIFO PREVIEW
-            TifoView(grid: tifoVM.generatedTifo)
-                .frame(height: 200)
-            
-            // MARK: - ACTIONS
-            VStack(spacing: 12) {
+            // 🎯 ACTION BAR
+            HStack(spacing: 12) {
                 
-                Button("Generate Tifo from Logo") {
-                    guard let team = selectedTeam else { return }
-                    
+                ActionIconButton(title: "Generate", icon: "sparkles") {
                     Task {
                         await tifoVM.generateTifo(for: team)
                     }
                 }
-                .buttonStyle(.borderedProminent)
                 
-                Button("Edit Tifo") {}
-                    .buttonStyle(.bordered)
+                ActionIconButton(title: "Edit", icon: "pencil") {
+                    // TODO
+                }
                 
-                Button("Publish to Social Media") {}
-                    .buttonStyle(.bordered)
+                ActionIconButton(title: "Share", icon: "square.and.arrow.up") {
+                    // TODO
+                }
                 
-                Button("Decorate Stadium") {}
-                    .buttonStyle(.bordered)
+                ActionIconButton(title: "Decorate", icon: "wand.and.stars") {
+                    // TODO
+                }
                 
-                Button(role: .destructive) {
+                ActionIconButton(title: "Delete", icon: "trash", isDestructive: true) {
                     Task {
-                        if let team = selectedTeam {
-                            try? await tifoVM.storageService?.deleteTifo(teamId: team.id)
-                            tifoVM.generatedTifo = nil
-                        }
+                        try? await tifoVM.storageService?.deleteTifo(teamId: team.id)
+                        tifoVM.generatedTifo = nil
                     }
-                } label: {
-                    Text("Delete Tifo")
                 }
             }
             
@@ -96,106 +78,36 @@ struct TifoGeneratorScreen: View {
             }
         }
         .onAppear {
-            tifoVM.setContext(context)
-            
-            Task {
-                await favoritesVM.fetchFavorites()
-                
-                if selectedTeam == nil,
-                   let firstId = favoritesVM.favoriteTeamIds.first {
-                    selectedTeam = getTeam(teamId: firstId)
-                }
-            }
-        }
-        .onChange(of: selectedTeam) { team in
-            guard let team else { return }
-            
             tifoVM.loadLocalTifo(teamId: team.id)
         }
     }
-    
-//    var body: some View {
-//        VStack(spacing: 0) {
-//            
-//            Text("Generate Tifo")
-//                .font(.largeTitle.bold())
-//                .padding(.top)
-//            
-//            if favoritesVM.favoriteTeamIds.isEmpty {
-//                Spacer()
-//                Text("No favorite teams yet")
-//                    .foregroundColor(.secondary)
-//                Spacer()
-//            } else {
-//                
-//                List {
-//                    ForEach(Array(favoritesVM.favoriteTeamIds), id: \.self) { teamId in
-//                        
-//                        Button {
-//                            Task {
-//                                if let team = getTeam(teamId: teamId) {
-//                                    await tifoVM.generateTifo(for: team)
-//                                }
-//                            }
-//                        } label: {
-//                            HStack {
-//                                Text("Team \(teamId)")
-//                                Spacer()
-//                                Image(systemName: "chevron.right")
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        .overlay {
-//            if tifoVM.isGenerating {
-//                ZStack {
-//                    Color.black.opacity(0.4).ignoresSafeArea()
-//                    ProgressView("Generating Tifo...")
-//                        .padding()
-//                        .background(.ultraThinMaterial)
-//                        .cornerRadius(12)
-//                }
-//            }
-//        }
-//        .onAppear {
-//            tifoVM.setContext(context)
-//            
-//            Task {
-//                await favoritesVM.fetchFavorites()
-//            }
-//        }
-//    }
-    
-    func getTeam(teamId: Int) -> TeamSummary? {
-        return TeamSummary(
-            id: teamId,
-            name: "Team \(teamId)",
-            logo: URL(string: "https://media.api-sports.io/football/teams/\(teamId).png")!
-        )
-    }
 }
 
-//struct TifoPreviewGrid: View {
-//    
-//    let grid: TifoGrid
-//    
-//    var columns: [GridItem] {
-//        Array(repeating: GridItem(.flexible(), spacing: 1), count: grid.cols)
-//    }
-//    
-//    var body: some View {
-//        LazyVGrid(columns: columns, spacing: 1) {
-//            ForEach(grid.cells.indices, id: \.self) { index in
-//                Rectangle()
-//                    .fill(Color(hex: grid.cells[index]))
-//                    .aspectRatio(1, contentMode: .fit)
-//            }
-//        }
-//        .background(Color.black)
-//    }
-//}
+struct ActionIconButton: View {
+    
+    let title: String
+    let icon: String
+    var isDestructive: Bool = false
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.headline)
+                    .frame(width: 40, height: 40)
+                    .background(isDestructive ? Color.red : Color.blue)
+                    .foregroundColor(.white)
+                    .clipShape(Circle())
+                
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.primary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
 
 extension Color {
     init(hex: String) {

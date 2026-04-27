@@ -15,6 +15,7 @@ final class TifoViewModel: ObservableObject {
     @Published var isGenerating = false
     @Published var errorMessage: String?
     @Published var generatedTifo: TifoGrid?
+    @Published var tifosByTeam: [Int: TifoGrid] = [:]
     
     private let generator = TifoGenerator()
     
@@ -70,6 +71,7 @@ final class TifoViewModel: ObservableObject {
             )
             
             generatedTifo = grid
+            tifosByTeam[team.id] = grid
             
         } catch {
             print("❌ ERROR:", error)
@@ -91,57 +93,38 @@ final class TifoViewModel: ObservableObject {
         storage
     }
     
+//    func loadLocalTifo(teamId: Int) {
+//        
+//        guard let storage else { return }
+//        
+//        if let local = storage.getLocalTifo(teamId: teamId) {
+//            generatedTifo = TifoGrid(
+//                rows: local.rows,
+//                cols: local.cols,
+//                cells: local.cells
+//            )
+//        } else {
+//            generatedTifo = nil
+//        }
+//    }
     func loadLocalTifo(teamId: Int) {
         
         guard let storage else { return }
         
         if let local = storage.getLocalTifo(teamId: teamId) {
-            generatedTifo = TifoGrid(
+            let grid = TifoGrid(
                 rows: local.rows,
                 cols: local.cols,
                 cells: local.cells
             )
+            
+            tifosByTeam[teamId] = grid
+            
+            generatedTifo = grid
         } else {
-            generatedTifo = nil
+//            tifosByTeam[teamId] = nil
+            tifosByTeam.removeValue(forKey: teamId)
         }
     }
     
-//    func generateTifo(for team: TeamSummary) async {
-//        guard let logoURL = team.logo else {
-//            errorMessage = "Invalid logo URL"
-//            return
-//        }
-//        
-//        isGenerating = true
-//        errorMessage = nil
-//        
-//        do {
-//            // 1. Generate grid
-//            let grid = try await generator.generate(
-//                from: logoURL,
-//                rows: 40,
-//                cols: 40
-//            )
-//            
-//            // 2. Save locally + Firebase
-//            try await storage?.saveBaseTifo(
-//                grid: grid,
-//                teamId: team.id
-//            )
-//            
-//            generatedTifo = grid
-//            
-//        } catch {
-//            errorMessage = error.localizedDescription
-//            print("🔥 FULL ERROR:", error)
-//            
-//            if let nsError = error as NSError? {
-//                print("🔥 Code:", nsError.code)
-//                print("🔥 Domain:", nsError.domain)
-//                print("🔥 UserInfo:", nsError.userInfo)
-//            }
-//        }
-//        
-//        isGenerating = false
-//    }
 }

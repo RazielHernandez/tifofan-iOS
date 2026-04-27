@@ -23,11 +23,13 @@ struct TifoFanApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var favoritesVM = FavoritesViewModel()
+    @StateObject private var tifosVM = TifoViewModel()
     
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(favoritesVM)
+                .environmentObject(tifosVM)
         }
         .modelContainer(for: [LocalTifo.self])
     }

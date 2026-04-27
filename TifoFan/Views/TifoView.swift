@@ -24,10 +24,9 @@ struct TifoView: View {
                     .padding(40)
             }
         }
-        .aspectRatio(1, contentMode: .fit)
-        .clipped()
-        .background(Color.black.opacity(0.05))
-        .cornerRadius(16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black.opacity(0.2))
+        .cornerRadius(12)
     }
 }
 

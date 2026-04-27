@@ -37,7 +37,7 @@ extension League {
     }
 }
 
-struct LeagueFavorite: Codable {
+struct LeagueFavorite: Codable, Identifiable {
     let id: Int
     let name: String
     let country: String?

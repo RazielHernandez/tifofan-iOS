@@ -11,6 +11,9 @@ internal import Combine
 @MainActor
 final class FavoritesViewModel: ObservableObject {
     
+    @Published var favoriteLeagues: [LeagueFavorite] = []
+    @Published var favoriteTeams: [TeamSummary] = []
+
     @Published var favoriteLeagueIds: Set<Int> = []
     @Published var favoriteTeamIds: Set<Int> = []
     
@@ -26,6 +29,9 @@ final class FavoritesViewModel: ObservableObject {
             let leagues = response.data.leagues
             let teams = response.data.teams
             
+            favoriteLeagues = leagues
+            favoriteTeams = teams
+
             favoriteLeagueIds = Set(leagues.map { $0.id })
             favoriteTeamIds = Set(teams.map { $0.id })
             
