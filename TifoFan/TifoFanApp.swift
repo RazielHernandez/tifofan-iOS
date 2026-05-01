@@ -24,12 +24,16 @@ struct TifoFanApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var favoritesVM = FavoritesViewModel()
     @StateObject private var tifosVM = TifoViewModel()
+    @StateObject private var leaguesVM = LeagueViewModel()
+    @StateObject private var teamStatsVM = TeamStatsViewModel()
     
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(favoritesVM)
                 .environmentObject(tifosVM)
+                .environmentObject(leaguesVM)
+                .environmentObject(teamStatsVM)
         }
         .modelContainer(for: [LocalTifo.self])
     }

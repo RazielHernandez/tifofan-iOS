@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 struct TifoGrid: Codable {
     let rows: Int
@@ -42,5 +43,16 @@ extension LocalTifo {
             cols: cols,
             cells: cells
         )
+    }
+}
+
+extension TifoGrid {
+    
+    var dominantColor: Color {
+        let counts = Dictionary(grouping: cells, by: { $0 })
+            .mapValues { $0.count }
+        
+        let hex = counts.max(by: { $0.value < $1.value })?.key ?? "#222222"
+        return Color(hex: hex)
     }
 }

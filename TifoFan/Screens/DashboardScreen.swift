@@ -12,9 +12,11 @@ struct DashboardScreen: View {
     
     @StateObject private var matchesVM = MatchViewModel()
     @EnvironmentObject var favoritesVM: FavoritesViewModel
+    @EnvironmentObject var tifoVM: TifoViewModel
+    @EnvironmentObject var leagueVM: LeagueViewModel
     
     @Environment(\.modelContext) private var context
-    @EnvironmentObject var tifoVM: TifoViewModel
+    
     
     
     var body: some View {
@@ -28,7 +30,7 @@ struct DashboardScreen: View {
                 ForEach(favoritesVM.favoriteLeagues) { league in
                     LeagueDashboardCard(
                         league: league,
-                        season: 2024,
+                        season: 2025,
                         matchesVM: matchesVM
                     )
                 }
@@ -36,7 +38,7 @@ struct DashboardScreen: View {
                 ForEach(favoritesVM.favoriteTeams) { team in
                     TeamDashboardCard(
                         team: team,
-                        season: 2024,
+                        // season: 2025,
                         matchesVM: matchesVM
                     )
                 }
@@ -45,7 +47,10 @@ struct DashboardScreen: View {
             .task {
                 tifoVM.setContext(context)
 
-                await favoritesVM.fetchFavorites()
+                async let favs = favoritesVM.fetchFavorites()
+                async let leagues = leagueVM.fetchLeagues()
+
+                _ = await (favs, leagues)
 
                 for team in favoritesVM.favoriteTeams {
                     tifoVM.loadLocalTifo(teamId: team.id)

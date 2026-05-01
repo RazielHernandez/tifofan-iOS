@@ -16,8 +16,6 @@ struct TeamsView: View {
     
     @EnvironmentObject var favoritesVM: FavoritesViewModel
     
-//    private let season = 2025
-    
     private var favoriteTeams: [TeamSummary] {
         vm.teams.filter { favoritesVM.favoriteTeamIds.contains($0.id) }
     }

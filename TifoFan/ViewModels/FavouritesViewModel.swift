@@ -36,7 +36,7 @@ final class FavoritesViewModel: ObservableObject {
             favoriteTeamIds = Set(teams.map { $0.id })
             
         } catch {
-            print("🔥 FULL ERROR:", error)
+            print("🔥 FAVOURITES VIEW MODEL ERROR:", error)
             errorMessage = error.localizedDescription
             
             if let nsError = error as NSError? {

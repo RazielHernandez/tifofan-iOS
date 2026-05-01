@@ -38,6 +38,10 @@ final class LeagueViewModel: ObservableObject {
         isLoading = false
     }
     
+    func currentSeason(for leagueId: Int) -> Int {
+        leagues.first(where: { $0.id == leagueId })?.currentSeason ?? 2025
+    }
+    
     func fetchLeaguesWithTeams(league: Int, season: Int) async {
         isLoading = true
         errorMessage = nil
@@ -47,7 +51,7 @@ final class LeagueViewModel: ObservableObject {
             
             teams = response.data
         } catch {
-            print("🔥 FULL ERROR:", error)
+            print("🔥 LEAGUES VIEW MODEL ERROR:", error)
             errorMessage = error.localizedDescription
             
             if let nsError = error as NSError? {

@@ -11,6 +11,8 @@ struct TeamSummary: Codable, Identifiable, Hashable {
     let id: Int
     let name: String
     let logo: URL?
+    let leagueId: Int
+    let season: Int
 }
 
 struct Team: Codable, Identifiable {
