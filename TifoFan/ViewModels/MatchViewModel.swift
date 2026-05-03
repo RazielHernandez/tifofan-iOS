@@ -97,30 +97,6 @@ final class MatchViewModel: ObservableObject {
     
     // MARK: - Fetch Matches by Team
     
-//    func fetchMatchesByTeam(
-//        teamId: Int,
-//        season: Int
-//    ) async {
-//        isLoading = true
-//        errorMessage = nil
-//        
-//        do {
-//            let response = try await service.getMatchesByTeam(
-//                teamId: teamId,
-//                season: season
-//            )
-//            
-//            withAnimation(.easeInOut) {
-//                matches = response.data.sorted { $0.date < $1.date }
-//            }
-//            
-//            currentFilter = .team
-//        } catch {
-//            handleError(error, functionName: "fetchMatchesByTeam")
-//        }
-//        
-//        isLoading = false
-//    }
     func fetchMatchesByTeam(teamId: Int, season: Int) async {
             isLoading = true
             errorMessage = nil

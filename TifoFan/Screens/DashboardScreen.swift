@@ -18,7 +18,7 @@ struct DashboardScreen: View {
     @Environment(\.modelContext) private var context
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             
             TabView {
                 
@@ -55,6 +55,7 @@ struct DashboardScreen: View {
                 }
             }
         }
+        .background(Color.clear)
     }
 }
 
@@ -65,13 +66,6 @@ struct GeneralDashboardCard: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                
-//                NavigationLink {
-//                    TifoGeneratorScreen(favoritesVM: favoritesVM)
-//                } label: {
-//                    TifoCard()
-//                }
-//                .buttonStyle(.plain)
                 
                 QuickActions()
                 

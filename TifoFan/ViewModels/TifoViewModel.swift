@@ -93,20 +93,6 @@ final class TifoViewModel: ObservableObject {
         storage
     }
     
-//    func loadLocalTifo(teamId: Int) {
-//        
-//        guard let storage else { return }
-//        
-//        if let local = storage.getLocalTifo(teamId: teamId) {
-//            generatedTifo = TifoGrid(
-//                rows: local.rows,
-//                cols: local.cols,
-//                cells: local.cells
-//            )
-//        } else {
-//            generatedTifo = nil
-//        }
-//    }
     func loadLocalTifo(teamId: Int) {
         
         guard let storage else { return }

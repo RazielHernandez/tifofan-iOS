@@ -20,10 +20,6 @@ final class TifoGenerator {
         
         let pixels = sampleGrid(from: cgImage, rows: rows, cols: cols)
         
-//        let cells = pixels.map { color -> String in
-//            let quantized = quantize(color, levels: 12)
-//            return toHex(quantized)
-//        }
         let cells = pixels.map { color -> String in
             
             var alpha: CGFloat = 0

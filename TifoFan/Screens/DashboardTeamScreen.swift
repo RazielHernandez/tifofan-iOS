@@ -41,21 +41,12 @@ struct TeamDashboardCard: View {
                         match: matchesVM.nextMatches[team.id],
                         isLoading: matchesVM.matchesByTeam[team.id] == nil
                     )
-//                    if let match = matchesVM.nextMatch(forTeam: team.id) {
-//                        NextMatchCard(match: match)
-//                    }
                     
                     TeamStatsPreview(team: team)
                 }
                 .padding()
             }
         }
-//        .task(id: team.id) {
-//            await matchesVM.fetchMatchesByTeam(
-//                teamId: team.id,
-//                season: team.season
-//            )
-//        }
         .task(id: team.id) {
             if matchesVM.matchesByTeam[team.id] == nil {
                 await matchesVM.fetchMatchesByTeam(
@@ -189,7 +180,6 @@ struct NextMatchCard: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                // Label(match.venue.name, systemImage: "mappin")
                 Label(formatDate(match.date), systemImage: "clock")
             }
             .font(.caption)
