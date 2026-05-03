@@ -10,27 +10,6 @@ import SwiftUI
 
 final class TifoGenerator {
     
-//    func generate(from url: URL, rows: Int, cols: Int) async throws -> TifoGrid {
-//        
-//        let image = try await downloadImage(from: url)
-//        
-//        guard let cgImage = resizeImage(image, targetSize: CGSize(width: cols, height: rows)) else {
-//            throw NSError(domain: "ResizeError", code: 0)
-//        }
-//        
-//        let pixels = extractPixels(from: cgImage)
-//        
-//        var cells: [String] = []
-//        cells.reserveCapacity(rows * cols)
-//        
-//        for color in pixels {
-//            let quantized = quantize(color, levels: 10)
-//            let hex = toHex(quantized)
-//            cells.append(hex)
-//        }
-//        
-//        return TifoGrid(rows: rows, cols: cols, cells: cells)
-//    }
     func generate(from url: URL, rows: Int, cols: Int) async throws -> TifoGrid {
         
         let image = try await downloadImage(from: url)
@@ -41,7 +20,19 @@ final class TifoGenerator {
         
         let pixels = sampleGrid(from: cgImage, rows: rows, cols: cols)
         
+//        let cells = pixels.map { color -> String in
+//            let quantized = quantize(color, levels: 12)
+//            return toHex(quantized)
+//        }
         let cells = pixels.map { color -> String in
+            
+            var alpha: CGFloat = 0
+            color.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+            
+            if alpha < 0.1 {
+                return "clear"
+            }
+            
             let quantized = quantize(color, levels: 12)
             return toHex(quantized)
         }
@@ -72,12 +63,11 @@ final class TifoGenerator {
         for row in 0..<rows {
             for col in 0..<cols {
                 
-//                let x = col * cellWidth + cellWidth / 2
-//                let y = row * cellHeight + cellHeight / 2
+                
                 let x = Int((CGFloat(col) + 0.5) * cellWidth)
                 let y = Int((CGFloat(row) + 0.5) * cellHeight)
                 
-//                let index = ((y * width) + x) * 4
+                
                 let bytesPerRow = cgImage.bytesPerRow
                 let index = y * bytesPerRow + x * 4
                 
@@ -107,15 +97,6 @@ final class TifoGenerator {
         return image
     }
     
-//    func resizeImage(_ image: UIImage, targetSize: CGSize) -> CGImage? {
-//        let renderer = UIGraphicsImageRenderer(size: targetSize)
-//        
-//        let resized = renderer.image { _ in
-//            image.draw(in: CGRect(origin: .zero, size: targetSize))
-//        }
-//        
-//        return resized.cgImage
-//    }
     func resizeImage(_ image: UIImage, targetSize: CGSize) -> CGImage? {
         
         let aspectWidth = targetSize.width / image.size.width

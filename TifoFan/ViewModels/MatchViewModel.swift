@@ -24,6 +24,9 @@ final class MatchViewModel: ObservableObject {
     @Published var statistics: [TeamMatchStatistics] = []
     @Published var currentFilter: MatchFilter = .league
     
+    @Published var matchesByTeam: [Int: [Match]] = [:]
+    @Published var nextMatches: [Int: Match] = [:]
+    
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -94,30 +97,59 @@ final class MatchViewModel: ObservableObject {
     
     // MARK: - Fetch Matches by Team
     
-    func fetchMatchesByTeam(
-        teamId: Int,
-        season: Int
-    ) async {
-        isLoading = true
-        errorMessage = nil
-        
-        do {
-            let response = try await service.getMatchesByTeam(
-                teamId: teamId,
-                season: season
-            )
+//    func fetchMatchesByTeam(
+//        teamId: Int,
+//        season: Int
+//    ) async {
+//        isLoading = true
+//        errorMessage = nil
+//        
+//        do {
+//            let response = try await service.getMatchesByTeam(
+//                teamId: teamId,
+//                season: season
+//            )
+//            
+//            withAnimation(.easeInOut) {
+//                matches = response.data.sorted { $0.date < $1.date }
+//            }
+//            
+//            currentFilter = .team
+//        } catch {
+//            handleError(error, functionName: "fetchMatchesByTeam")
+//        }
+//        
+//        isLoading = false
+//    }
+    func fetchMatchesByTeam(teamId: Int, season: Int) async {
+            isLoading = true
+            errorMessage = nil
             
-            withAnimation(.easeInOut) {
-                matches = response.data.sorted { $0.date < $1.date }
+            do {
+                let response = try await service.getMatchesByTeam(
+                    teamId: teamId,
+                    season: season
+                )
+                
+                let sorted = response.data.sorted { $0.date < $1.date }
+                let now = Date()
+                
+                // ✅ Compute next match ONCE
+                let next = sorted.first { $0.date >= now }
+                
+                withAnimation(.easeInOut) {
+                    matchesByTeam[teamId] = sorted
+                    nextMatches[teamId] = next
+                }
+                
+                currentFilter = .team
+                
+            } catch {
+                handleError(error, functionName: "fetchMatchesByTeam")
             }
             
-            currentFilter = .team
-        } catch {
-            handleError(error, functionName: "fetchMatchesByTeam")
+            isLoading = false
         }
-        
-        isLoading = false
-    }
     
     // MARK: - fetch Matches by date (one day)
     

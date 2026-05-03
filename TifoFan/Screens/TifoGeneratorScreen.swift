@@ -26,7 +26,7 @@ struct TifoGeneratorScreen: View {
             ZStack {
                 
                 // Stadium background
-                Image("stadium_bg") // 👉 add to assets
+                Image("stadium_bg")
                     .resizable()
                     .scaledToFill()
                     .overlay(Color.black.opacity(0.35))

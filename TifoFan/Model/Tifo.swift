@@ -49,7 +49,11 @@ extension LocalTifo {
 extension TifoGrid {
     
     var dominantColor: Color {
-        let counts = Dictionary(grouping: cells, by: { $0 })
+//        let counts = Dictionary(grouping: cells, by: { $0 })
+//            .mapValues { $0.count }
+        let filtered = cells.filter { $0 != "clear" }
+
+        let counts = Dictionary(grouping: filtered, by: { $0 })
             .mapValues { $0.count }
         
         let hex = counts.max(by: { $0.value < $1.value })?.key ?? "#222222"

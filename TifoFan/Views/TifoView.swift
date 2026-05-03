@@ -49,14 +49,20 @@ struct TifoPreviewGrid: View {
                 spacing: spacing
             ) {
                 ForEach(grid.cells.indices, id: \.self) { index in
+//                    Rectangle()
+//                        .fill(Color(hex: grid.cells[index]))
+//                        .frame(width: cellSize, height: cellSize)
                     Rectangle()
-                        .fill(Color(hex: grid.cells[index]))
+                        .fill(
+                            grid.cells[index] == "clear"
+                            ? Color.clear
+                            : Color(hex: grid.cells[index])
+                        )
                         .frame(width: cellSize, height: cellSize)
                 }
             }
         }
         .aspectRatio(CGFloat(grid.cols) / CGFloat(grid.rows), contentMode: .fit)
-        .background(Color.black)
         .clipped()
     }
 }

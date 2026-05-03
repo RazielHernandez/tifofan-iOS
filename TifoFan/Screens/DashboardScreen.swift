@@ -17,8 +17,6 @@ struct DashboardScreen: View {
     
     @Environment(\.modelContext) private var context
     
-    
-    
     var body: some View {
         NavigationView {
             

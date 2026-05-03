@@ -21,14 +21,15 @@ struct TeamDashboardCard: View {
         
         
         ZStack {
-            baseColor.opacity(0.12).ignoresSafeArea()
+            baseColor
+                .opacity(0.15)
+                .ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 16) {
                     
                     TeamHeader(team: team)
                     
-                    // 🎨 TIFO
                     NavigationLink {
                         TifoGeneratorScreen(team: team)
                     } label: {
@@ -36,23 +37,27 @@ struct TeamDashboardCard: View {
                     }
                     .buttonStyle(.plain)
                     
-                    // ⚽ NEXT MATCH
-                    if let match = matchesVM.nextMatch(forTeam: team.id) {
-                        NextMatchCard(match: match)
-                    }
+                    NextMatchSection(
+                        match: matchesVM.nextMatches[team.id],
+                        isLoading: matchesVM.matchesByTeam[team.id] == nil
+                    )
+//                    if let match = matchesVM.nextMatch(forTeam: team.id) {
+//                        NextMatchCard(match: match)
+//                    }
                     
-                    // 📊 STATS
                     TeamStatsPreview(team: team)
-                    
                 }
                 .padding()
             }
-            .background(
-                baseColor
-                    .opacity(0.2)
-                    .ignoresSafeArea()
-            )
-            .task {
+        }
+//        .task(id: team.id) {
+//            await matchesVM.fetchMatchesByTeam(
+//                teamId: team.id,
+//                season: team.season
+//            )
+//        }
+        .task(id: team.id) {
+            if matchesVM.matchesByTeam[team.id] == nil {
                 await matchesVM.fetchMatchesByTeam(
                     teamId: team.id,
                     season: team.season
@@ -60,6 +65,47 @@ struct TeamDashboardCard: View {
             }
         }
         
+    }
+}
+
+struct NextMatchSection: View {
+    
+    let match: Match?
+    let isLoading: Bool
+    
+    var body: some View {
+        VStack {
+            if isLoading {
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    
+                    Label("Next Match", systemImage: "calendar")
+                        .font(.headline)
+                    
+                    HStack {
+                        
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    }
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                }
+                .padding()
+                .background(.ultraThinMaterial)
+                .cornerRadius(16)
+                
+                
+            } else if let match {
+                NextMatchCard(match: match)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+            } else {
+                Text("No upcoming match")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .animation(.easeInOut, value: match?.id)
     }
 }
 
@@ -181,7 +227,6 @@ struct TeamStatsPreview: View {
                 
             } else if let stats {
                 
-                // 🔥 FORM
                 FormView(form: stats.stats.form)
                 
                 HStack {
@@ -226,14 +271,7 @@ struct FormView: View {
     
     var body: some View {
         HStack(spacing: 6) {
-//            ForEach(Array(form.suffix(5)), id: \.self) { result in
-//                Text(String(result))
-//                    .font(.caption.bold())
-//                    .frame(width: 28, height: 28)
-//                    .background(color(for: result))
-//                    .foregroundColor(.white)
-//                    .clipShape(Circle())
-//            }
+            
             ForEach(Array(form.suffix(5).enumerated()), id: \.offset) { index, result in
                 Text(String(result))
                     .frame(width: 28, height: 28)
