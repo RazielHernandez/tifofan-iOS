@@ -19,7 +19,7 @@ struct DashboardScreen: View {
     
     var body: some View {
         NavigationStack {
-            
+                
             TabView {
                 
                 // 🏠 GENERAL CARD
@@ -36,7 +36,6 @@ struct DashboardScreen: View {
                 ForEach(favoritesVM.favoriteTeams) { team in
                     TeamDashboardCard(
                         team: team,
-                        // season: 2025,
                         matchesVM: matchesVM
                     )
                 }
@@ -55,7 +54,9 @@ struct DashboardScreen: View {
                 }
             }
         }
-        .background(Color.clear)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .ignoresSafeArea()
     }
 }
 
@@ -139,6 +140,12 @@ struct TifoCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
+            
+            Image("TifoBackground")
+                .resizable()
+                .scaledToFill()
+                .overlay(Color.black.opacity(0.35))
+                .clipped()
 
             TifoView(grid: grid)
                 .frame(height: 200)

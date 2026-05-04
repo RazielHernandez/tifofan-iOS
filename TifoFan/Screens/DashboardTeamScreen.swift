@@ -15,37 +15,55 @@ struct TeamDashboardCard: View {
     @EnvironmentObject var tifoVM: TifoViewModel
     
     var body: some View {
-        
+
         let tifo = tifoVM.tifosByTeam[team.id]
-        let baseColor = tifo?.dominantColor ?? Color.blue
-        
-        
+        let primary = tifo?.dominantColor ?? .blue
+        let secondary = tifo?.secondaryColor ?? primary.opacity(0.6)
+
         ZStack {
-            baseColor
-                .opacity(0.15)
-                .ignoresSafeArea()
+
             
+
+            // 🧩 CARD
             ScrollView {
                 VStack(spacing: 16) {
-                    
+
                     TeamHeader(team: team)
-                    
+
                     NavigationLink {
                         TifoGeneratorScreen(team: team)
                     } label: {
                         TifoCard(grid: tifo)
                     }
                     .buttonStyle(.plain)
-                    
+
                     NextMatchSection(
                         match: matchesVM.nextMatches[team.id],
                         isLoading: matchesVM.matchesByTeam[team.id] == nil
                     )
-                    
+
                     TeamStatsPreview(team: team)
                 }
                 .padding()
             }
+            //.background(.ultraThinMaterial) // 👈 card surface
+            .background(
+    
+                LinearGradient(
+                    colors: [
+                        primary.opacity(0.55),
+                        secondary.opacity(0.55),
+                        primary.opacity(0.25),
+                        Color.clear
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 24)) // 👈 THIS is key
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
         }
         .task(id: team.id) {
             if matchesVM.matchesByTeam[team.id] == nil {
@@ -55,8 +73,60 @@ struct TeamDashboardCard: View {
                 )
             }
         }
-        
     }
+    
+//    var body: some View {
+//        
+//        let tifo = tifoVM.tifosByTeam[team.id]
+//        let primary = tifo?.dominantColor ?? .blue
+//        let secondary = tifo?.secondaryColor ?? primary.opacity(0.6)
+//
+//        ScrollView {
+//            VStack(spacing: 16) {
+//                
+//                TeamHeader(team: team)
+//                
+//                NavigationLink {
+//                    TifoGeneratorScreen(team: team)
+//                } label: {
+//                    TifoCard(grid: tifo)
+//                }
+//                .buttonStyle(.plain)
+//                
+//                NextMatchSection(
+//                    match: matchesVM.nextMatches[team.id],
+//                    isLoading: matchesVM.matchesByTeam[team.id] == nil
+//                )
+//                
+//                TeamStatsPreview(team: team)
+//            }
+//            .padding()
+//        }
+//        .background(
+//            
+//            LinearGradient(
+//                colors: [
+//                    primary.opacity(0.55),
+//                    secondary.opacity(0.55),
+//                    primary.opacity(0.25),
+//                    Color.clear
+//                ],
+//                startPoint: .topLeading,
+//                endPoint: .bottomTrailing
+//            )
+//            .ignoresSafeArea()
+//        )
+//        .padding()
+//        .cornerRadius(16)
+//        .task(id: team.id) {
+//            if matchesVM.matchesByTeam[team.id] == nil {
+//                await matchesVM.fetchMatchesByTeam(
+//                    teamId: team.id,
+//                    season: team.season
+//                )
+//            }
+//        }
+//    }
 }
 
 struct NextMatchSection: View {
@@ -207,23 +277,38 @@ struct TeamStatsPreview: View {
         
         let stats = statsVM.statsByTeam[team.id]
         
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             
             Label("Team Stats", systemImage: "chart.bar")
                 .font(.headline)
             
             if statsVM.isLoading && stats == nil {
                 ProgressView()
+                    .frame(maxWidth: .infinity)
                 
             } else if let stats {
                 
+                // 🔥 FORM
                 FormView(form: stats.stats.form)
                 
-                HStack {
-                    statCard("Played", stats.aggregates.matchesPlayed)
-                    statCard("Wins", stats.aggregates.wins)
-                    statCard("Goals", stats.aggregates.goalsFor)
+                // ➖ DIVIDER (subtle)
+                Divider()
+                    .opacity(0.6)
+                
+                // 📊 AGGREGATES
+                VStack(alignment: .leading, spacing: 10) {
+                    
+                    Label("Season Overview", systemImage: "chart.xyaxis.line")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    HStack(spacing: 12) {
+                        statCard("Played", stats.aggregates.matchesPlayed)
+                        statCard("Wins", stats.aggregates.wins)
+                        statCard("Goals", stats.aggregates.goalsFor)
+                    }
                 }
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
                 
             } else {
                 Text("No stats available")
@@ -244,30 +329,80 @@ struct TeamStatsPreview: View {
     }
     
     private func statCard(_ title: String, _ value: Int) -> some View {
-        VStack {
+        VStack(spacing: 6) {
             Text("\(value)")
                 .font(.headline.bold())
+            
             Text(title)
                 .font(.caption)
                 .foregroundColor(.gray)
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.05))
+        .cornerRadius(10)
     }
 }
 
 struct FormView: View {
     
     let form: String
+    @State private var animate = false
     
     var body: some View {
-        HStack(spacing: 6) {
+        VStack(alignment: .leading, spacing: 10) {
             
-            ForEach(Array(form.suffix(5).enumerated()), id: \.offset) { index, result in
-                Text(String(result))
-                    .frame(width: 28, height: 28)
-                    .background(color(for: result))
-                    .clipShape(Circle())
+            // 🔥 TITLE + LEGEND
+            HStack {
+                Label("Recent Form", systemImage: "waveform.path.ecg")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                legend
             }
+            
+            // 🎯 LAST 5 MATCHES
+            HStack(spacing: 8) {
+                ForEach(Array(form.suffix(5).enumerated()), id: \.offset) { index, result in
+                    Text(String(result))
+                        .font(.caption.bold())
+                        .frame(width: 28, height: 28)
+                        .background(color(for: result))
+                        .foregroundColor(.white)
+                        .clipShape(Circle())
+                        .scaleEffect(animate ? 1 : 0.6)
+                        .opacity(animate ? 1 : 0)
+                        .animation(
+                            .spring(response: 0.4, dampingFraction: 0.7)
+                            .delay(Double(index) * 0.05),
+                            value: animate
+                        )
+                }
+            }
+        }
+        .onAppear {
+            animate = true
+        }
+    }
+    
+    // 🎨 LEGEND
+    private var legend: some View {
+        HStack(spacing: 6) {
+            legendItem("W", .green)
+            legendItem("D", .orange)
+            legendItem("L", .red)
+        }
+        .font(.caption2)
+    }
+    
+    private func legendItem(_ text: String, _ color: Color) -> some View {
+        HStack(spacing: 2) {
+            Circle()
+                .fill(color)
+                .frame(width: 6, height: 6)
+            Text(text)
         }
     }
     

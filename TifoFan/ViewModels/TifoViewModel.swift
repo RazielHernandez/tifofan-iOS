@@ -14,7 +14,6 @@ final class TifoViewModel: ObservableObject {
     
     @Published var isGenerating = false
     @Published var errorMessage: String?
-    @Published var generatedTifo: TifoGrid?
     @Published var tifosByTeam: [Int: TifoGrid] = [:]
     
     private let generator = TifoGenerator()
@@ -46,7 +45,6 @@ final class TifoViewModel: ObservableObject {
             if let local = storage.getLocalTifo(teamId: team.id) {
                 print("⚡ Found local tifo → loading instantly")
                 
-                generatedTifo = mapToGrid(local)
                 isGenerating = false
                 return
             }
@@ -70,7 +68,7 @@ final class TifoViewModel: ObservableObject {
                 teamId: team.id
             )
             
-            generatedTifo = grid
+            //generatedTifo = grid
             tifosByTeam[team.id] = grid
             
         } catch {
@@ -106,9 +104,8 @@ final class TifoViewModel: ObservableObject {
             
             tifosByTeam[teamId] = grid
             
-            generatedTifo = grid
+            //generatedTifo = grid
         } else {
-//            tifosByTeam[teamId] = nil
             tifosByTeam.removeValue(forKey: teamId)
         }
     }

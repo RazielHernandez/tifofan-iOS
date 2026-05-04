@@ -26,14 +26,14 @@ struct TifoGeneratorScreen: View {
             ZStack {
                 
                 // Stadium background
-                Image("stadium_bg")
+                Image("TifoBackground")
                     .resizable()
                     .scaledToFill()
                     .overlay(Color.black.opacity(0.35))
                     .clipped()
                 
                 // Tifo
-                TifoView(grid: tifoVM.generatedTifo)
+                TifoView(grid: tifoVM.tifosByTeam[team.id])
                     .padding(16)
             }
             .frame(maxWidth: .infinity)
@@ -64,7 +64,6 @@ struct TifoGeneratorScreen: View {
                 ActionIconButton(title: "Delete", icon: "trash", isDestructive: true) {
                     Task {
                         try? await tifoVM.storageService?.deleteTifo(teamId: team.id)
-                        tifoVM.generatedTifo = nil
                     }
                 }
             }

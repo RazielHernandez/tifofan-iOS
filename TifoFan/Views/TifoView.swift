@@ -49,9 +49,6 @@ struct TifoPreviewGrid: View {
                 spacing: spacing
             ) {
                 ForEach(grid.cells.indices, id: \.self) { index in
-//                    Rectangle()
-//                        .fill(Color(hex: grid.cells[index]))
-//                        .frame(width: cellSize, height: cellSize)
                     Rectangle()
                         .fill(
                             grid.cells[index] == "clear"
