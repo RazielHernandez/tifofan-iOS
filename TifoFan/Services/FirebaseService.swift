@@ -188,6 +188,25 @@ extension FirebaseService {
         )
     }
     
+    func getNextMatches(
+        leagueId: Int?,
+        teamId: Int?,
+        season: Int,
+        next: Int
+    ) async throws -> MatchesResponse {
+        
+        try await callFunction(
+            name: "v1-getNextMatchesCallable",
+            data: [
+                "league": leagueId as Any,
+                "team": teamId as Any,
+                "season": season,
+                "next": next
+            ],
+            responseType: MatchesResponse.self
+        )
+    }
+    
     func getMatchDetail(
         matchId: Int
     ) async throws -> MatchDetailResponse {

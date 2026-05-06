@@ -21,10 +21,6 @@ struct TeamDashboardCard: View {
         let secondary = tifo?.secondaryColor ?? primary.opacity(0.6)
 
         ZStack {
-
-            
-
-            // 🧩 CARD
             ScrollView {
                 VStack(spacing: 16) {
 
@@ -46,7 +42,6 @@ struct TeamDashboardCard: View {
                 }
                 .padding()
             }
-            //.background(.ultraThinMaterial) // 👈 card surface
             .background(
     
                 LinearGradient(
@@ -61,7 +56,8 @@ struct TeamDashboardCard: View {
                 )
                 .ignoresSafeArea()
             )
-            .clipShape(RoundedRectangle(cornerRadius: 24)) // 👈 THIS is key
+            .scrollIndicators(.hidden)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
         }
@@ -188,11 +184,11 @@ struct TeamHeader: View {
             VStack(alignment: .leading, spacing: 4) {
                 
                 Text(team.name)
-                    .font(.headline)
+                    .font(.title2)
                 
-                Text("Team")
-                    .font(.caption)
-                    .foregroundColor(.gray)
+//                Text("Team")
+//                    .font(.caption)
+//                    .foregroundColor(.gray)
             }
             
             Spacer()

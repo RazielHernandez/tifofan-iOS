@@ -156,8 +156,6 @@ struct TeamPlayersListView: View {
     
     @StateObject private var vm = TeamPlayersViewModel()
     
-//    private let season = 2024
-    
     var body: some View {
         VStack(alignment: .leading) {
             

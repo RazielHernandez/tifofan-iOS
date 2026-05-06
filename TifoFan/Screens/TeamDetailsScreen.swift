@@ -29,7 +29,10 @@ struct TeamDetailsScreen: View {
     }
     
     private var sortedMatches: [Match] {
-        matchVM.matches.sorted { $0.date < $1.date }
+        print("There are \(matchVM.matches.count) matches")
+        // return matchVM.matches.sorted { $0.date < $1.date }
+        return matchVM.matchesByTeam[team.id]?.sorted { $0.date < $1.date } ?? []
+        
     }
 
     private var now: Date {
@@ -88,12 +91,12 @@ struct TeamDetailsScreen: View {
                 await favoritesVM.fetchFavorites()
             }
             
-            if matchVM.matches.isEmpty {
+            //if matchVM.matches.isEmpty {
                 await matchVM.fetchMatchesByTeam(
                     teamId: team.id,
                     season: season
                 )
-            }
+            //}
         }
     }
     

@@ -41,7 +41,7 @@ struct MatchEvent: Codable, Identifiable {
     let id = UUID()
     
     let time: EventTime
-    let team: TeamSummary
+    let team: Team
     let player: EventPlayer
     let assist: EventPlayer?
     

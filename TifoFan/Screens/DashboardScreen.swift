@@ -23,22 +23,26 @@ struct DashboardScreen: View {
             TabView {
                 
                 // 🏠 GENERAL CARD
-                GeneralDashboardCard()
-                
-                ForEach(favoritesVM.favoriteLeagues) { league in
-                    LeagueDashboardCard(
-                        league: league,
-                        season: 2025,
-                        matchesVM: matchesVM
-                    )
-                }
+                if (favoritesVM.favoriteLeagues.isEmpty && favoritesVM.favoriteTeams.isEmpty) {
+                    GeneralDashboardCard()
+                } else {
+                    ForEach(favoritesVM.favoriteLeagues) { league in
+                        LeagueDashboardCard(
+                            league: league,
+                            season: 2025,
+                            matchesVM: matchesVM
+                        )
+                    }
 
-                ForEach(favoritesVM.favoriteTeams) { team in
-                    TeamDashboardCard(
-                        team: team,
-                        matchesVM: matchesVM
-                    )
+                    ForEach(favoritesVM.favoriteTeams) { team in
+                        TeamDashboardCard(
+                            team: team,
+                            matchesVM: matchesVM
+                        )
+                    }
                 }
+                
+                
             }
             .tabViewStyle(.page(indexDisplayMode: .automatic))
             .task {
@@ -97,42 +101,65 @@ struct MatchesSection: View {
     }
 }
 
-struct LeagueDashboardCard: View {
-    
-    let league: LeagueFavorite
-    let season: Int
-    @ObservedObject var matchesVM: MatchViewModel
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                
-                // 🔥 HEADER
-                LeagueHeader(league: league)
-                
-                // ⚽ NEXT / LIVE MATCH
-                if let match = matchesVM.nextMatch(for: league.id) {
-                    MatchHighlightCard(match: match)
-                } else {
-                    Text("No upcoming matches")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                
-                // 📊 STANDINGS PREVIEW
-                StandingsPreview(leagueId: league.id)
-                
-            }
-            .padding()
-        }
-        .task {
-            await matchesVM.fetchMatches(
-                leagueId: league.id,
-                season: season
-            )
-        }
-    }
-}
+//struct LeagueDashboardCard: View {
+//    
+//    let league: LeagueFavorite
+//    let season: Int
+//    @ObservedObject var matchesVM: MatchViewModel
+//    
+//    var body: some View {
+//        
+//        let primary = Color.accent
+//        let secondary = Color.secondary
+//        
+//        ZStack {
+//            ScrollView {
+//                VStack(spacing: 16) {
+//                    
+//                    // 🔥 HEADER
+//                    LeagueHeader(league: league)
+//                    
+//                    // ⚽ NEXT / LIVE MATCH
+//                    if let match = matchesVM.nextMatch(for: league.id) {
+//                        MatchHighlightCard(match: match)
+//                    } else {
+//                        Text("No upcoming matches")
+//                            .font(.caption)
+//                            .foregroundColor(.gray)
+//                    }
+//                    
+//                    // 📊 STANDINGS PREVIEW
+//                    StandingsPreview(leagueId: league.id)
+//                    
+//                }
+//                .padding()
+//            }
+//            .background(
+//                LinearGradient(
+//                    colors: [
+//                        primary.opacity(0.55),
+//                        secondary.opacity(0.55),
+//                        primary.opacity(0.25),
+//                        Color.clear
+//                    ],
+//                    startPoint: .topLeading,
+//                    endPoint: .bottomTrailing
+//                )
+//                .ignoresSafeArea()
+//            )
+//            .scrollIndicators(.hidden)
+//            .clipShape(RoundedRectangle(cornerRadius: 24))
+//            .padding(.horizontal, 16)
+//            .padding(.vertical, 12)
+//        }
+//        .task {
+//            await matchesVM.fetchMatches(
+//                leagueId: league.id,
+//                season: season
+//            )
+//        }
+//    }
+//}
 
 struct TifoCard: View {
 
